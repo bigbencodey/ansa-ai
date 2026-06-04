@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline'; font-src * data:; connect-src * wss:; media-src * blob: mediastream:">
 <meta name="description" content="Ansa AI — The elite AI receptionist for home services. Never miss a $700 call again.">
 <meta name="theme-color" content="#050508">
 <title>Ansa AI — Never Miss a $700 Call Again</title>
@@ -654,185 +655,167 @@ footer{background:var(--black);border-top:0.5px solid rgba(255,255,255,0.055);pa
 
 
 <script>
-/* ── VAPI: inline SDK fetch + call logic ──────────────────────
-   No external script tag = no CSP block on Vercel.
-   We fetch the SDK text, eval it, then wire the button.
-─────────────────────────────────────────────────────────────── */
+/* ============================================================
+   VAPI — wired directly via unpkg (different CDN from jsdelivr,
+   avoids any cached Vercel block on jsdelivr specifically)
+   The http-equiv CSP meta tag in <head> permits all sources.
+============================================================ */
 (function() {
-  // Fetch the Vapi SDK and eval it inline
-  fetch("https://cdn.jsdelivr.net/npm/@vapi-ai/web/dist/vapi.min.js")
-    .then(function(r) { return r.text(); })
-    .then(function(code) {
-      // Run the SDK code in global scope
-      var s = document.createElement("script");
-      s.textContent = code;
-      document.head.appendChild(s);
-      console.log("Vapi SDK injected inline ✓", typeof window.Vapi);
-      wireCallButton();
-    })
-    .catch(function(err) {
-      console.error("Failed to fetch Vapi SDK:", err);
-      var sub = document.getElementById("callSubtitle");
-      if (sub) { sub.innerText = "Error: " + err.message; sub.style.color = "#ff4444"; }
-    });
+  var PUBKEY = "09e97377-87a5-4fc9-b127-788cc5b7ef41";
+  var ASST   = "20b00f4b-9715-4a68-8651-43cf1f88870a";
+  var vapi   = null;
 
-  function wireCallButton() {
-    var btn = document.getElementById("callBtn");
-    if (!btn) { setTimeout(wireCallButton, 300); return; }
-    if (!window.Vapi) { setTimeout(wireCallButton, 300); return; }
+  /* Try three CDNs in sequence until one loads */
+  var cdns = [
+    "https://unpkg.com/@vapi-ai/web/dist/vapi.min.js",
+    "https://cdn.jsdelivr.net/npm/@vapi-ai/web/dist/vapi.min.js",
+    "https://esm.run/@vapi-ai/web"
+  ];
+  var tried = 0;
 
-    console.log("Wiring callBtn ✓");
-    var vapi = new window.Vapi("09e97377-87a5-4fc9-b127-788cc5b7ef41");
+  function tryLoad() {
+    if (tried >= cdns.length) {
+      showErr("SDK unavailable — please try a different browser");
+      return;
+    }
+    var s = document.createElement("script");
+    s.src = cdns[tried++];
+    s.onload = function() {
+      if (window.Vapi) { init(); }
+      else { setTimeout(function(){ window.Vapi ? init() : tryLoad(); }, 800); }
+    };
+    s.onerror = function() { tryLoad(); };
+    document.head.appendChild(s);
+  }
+
+  function showErr(msg) {
+    var sub = document.getElementById("callSubtitle");
+    if (sub) { sub.innerText = msg; sub.style.color = "#ff4444"; }
+    console.error("[Vapi]", msg);
+  }
+
+  function init() {
+    console.log("[Vapi] SDK loaded from:", cdns[tried - 1]);
+    vapi = new window.Vapi(PUBKEY);
 
     vapi.on("call-start", function() {
-      console.log("call-start ✓");
-      btn.innerText = "End Call";
-      btn.style.background = "#ff4444";
-      btn.className = "vapi-call-btn btn-red";
-      btn.disabled = false;
-      btn.classList.add("active");
+      var btn = document.getElementById("callBtn");
       var sub = document.getElementById("callSubtitle");
-      if (sub) { sub.innerText = "Connected"; sub.style.color = ""; }
-      var s = document.getElementById("vapiScreen"); if (s) s.className = "modal-screen-content vapi-call-state-active";
-      var iv = document.getElementById("vapiIdleVisual"); if (iv) iv.style.display = "none";
-      var av = document.getElementById("vapiActiveVisual"); if (av) av.style.display = "flex";
-      var lb = document.getElementById("vapiBtnLabel"); if (lb) lb.innerText = "End Call";
-      var t = document.getElementById("vapiTimer"); if (t) t.classList.remove("hidden-elm");
+      if (btn) { btn.innerText="End Call"; btn.style.background="#ff4444"; btn.className="vapi-call-btn btn-red"; btn.disabled=false; btn.classList.add("active"); }
+      if (sub) { sub.innerText="Connected"; sub.style.color=""; }
+      var s=document.getElementById("vapiScreen"); if(s) s.className="modal-screen-content vapi-call-state-active";
+      var iv=document.getElementById("vapiIdleVisual"); if(iv) iv.style.display="none";
+      var av=document.getElementById("vapiActiveVisual"); if(av) av.style.display="flex";
+      var lb=document.getElementById("vapiBtnLabel"); if(lb) lb.innerText="End Call";
+      var t=document.getElementById("vapiTimer"); if(t) t.classList.remove("hidden-elm");
     });
 
     vapi.on("call-end", function() {
-      console.log("call-end ✓");
-      btn.innerText = "Call";
-      btn.style.background = "";
-      btn.className = "vapi-call-btn btn-green";
-      btn.disabled = false;
-      btn.classList.remove("active");
-      var sub = document.getElementById("callSubtitle");
-      if (sub) { sub.innerText = "Ready to connect"; sub.style.color = ""; }
-      var s = document.getElementById("vapiScreen"); if (s) s.className = "modal-screen-content vapi-call-state-idle";
-      var iv = document.getElementById("vapiIdleVisual"); if (iv) iv.style.display = "flex";
-      var av = document.getElementById("vapiActiveVisual"); if (av) av.style.display = "none";
-      var t = document.getElementById("vapiTimer"); if (t) { t.classList.add("hidden-elm"); t.textContent = "00:00"; }
-      var lb = document.getElementById("vapiBtnLabel"); if (lb) lb.innerText = "Call Ansa AI";
+      var btn=document.getElementById("callBtn");
+      var sub=document.getElementById("callSubtitle");
+      if(btn){btn.innerText="Call";btn.style.background="";btn.className="vapi-call-btn btn-green";btn.disabled=false;btn.classList.remove("active");}
+      if(sub){sub.innerText="Ready to connect";sub.style.color="";}
+      var s=document.getElementById("vapiScreen"); if(s) s.className="modal-screen-content vapi-call-state-idle";
+      var iv=document.getElementById("vapiIdleVisual"); if(iv) iv.style.display="flex";
+      var av=document.getElementById("vapiActiveVisual"); if(av) av.style.display="none";
+      var t=document.getElementById("vapiTimer"); if(t){t.classList.add("hidden-elm");t.textContent="00:00";}
+      var lb=document.getElementById("vapiBtnLabel"); if(lb) lb.innerText="Call Ansa AI";
     });
 
     vapi.on("error", function(err) {
-      console.error("Vapi error:", err);
-      var msg = (err && (err.message || err.errorMsg || JSON.stringify(err))) || "Unknown error";
-      var sub = document.getElementById("callSubtitle");
-      if (sub) { sub.innerText = "Error: " + msg; sub.style.color = "#ff4444"; }
-      btn.innerText = "Call";
-      btn.style.background = "";
-      btn.className = "vapi-call-btn btn-green";
-      btn.disabled = false;
-      btn.classList.remove("active");
-      setTimeout(function() { var s = document.getElementById("callSubtitle"); if (s) { s.innerText = "Ready to connect"; s.style.color = ""; } }, 6000);
+      var msg=(err&&(err.message||err.errorMsg||JSON.stringify(err)))||"error";
+      showErr("Error: "+msg);
+      var btn=document.getElementById("callBtn");
+      if(btn){btn.innerText="Call";btn.style.background="";btn.className="vapi-call-btn btn-green";btn.disabled=false;btn.classList.remove("active");}
+      setTimeout(function(){var s=document.getElementById("callSubtitle");if(s){s.innerText="Ready to connect";s.style.color="";}},6000);
     });
 
+    wireBtn();
+  }
+
+  function wireBtn() {
+    var btn = document.getElementById("callBtn");
+    if (!btn) { setTimeout(wireBtn, 300); return; }
+    console.log("[Vapi] callBtn wired ✓");
+
     btn.addEventListener("click", function() {
-      console.log("Call btn clicked, active:", btn.classList.contains("active"));
+      if (!vapi) { showErr("Still loading, please wait..."); return; }
+      var sub = document.getElementById("callSubtitle");
       if (btn.classList.contains("active")) {
         vapi.stop();
       } else {
-        btn.innerText = "...";
-        btn.disabled = true;
-        var sub = document.getElementById("callSubtitle");
-        if (sub) { sub.innerText = "Connecting..."; sub.style.color = ""; }
-        vapi.start("20b00f4b-9715-4a68-8651-43cf1f88870a")
-          .then(function() { console.log("vapi.start() resolved ✓"); })
-          .catch(function(err) {
-            console.error("vapi.start() failed:", err);
-            var msg = (err && (err.message || err.errorMsg || JSON.stringify(err))) || "failed";
-            if (sub) { sub.innerText = "Error: " + msg; sub.style.color = "#ff4444"; }
-            btn.innerText = "Call";
-            btn.style.background = "";
-            btn.className = "vapi-call-btn btn-green";
-            btn.disabled = false;
-            setTimeout(function() { if (sub) { sub.innerText = "Ready to connect"; sub.style.color = ""; } }, 6000);
+        btn.innerText="..."; btn.disabled=true;
+        if(sub){sub.innerText="Connecting...";sub.style.color="";}
+        vapi.start(ASST)
+          .then(function(){console.log("[Vapi] start() resolved ✓");})
+          .catch(function(err){
+            var msg=(err&&(err.message||err.errorMsg||JSON.stringify(err)))||"failed";
+            showErr("Error: "+msg);
+            btn.innerText="Call";btn.style.background="";btn.className="vapi-call-btn btn-green";btn.disabled=false;
+            setTimeout(function(){var s=document.getElementById("callSubtitle");if(s){s.innerText="Ready to connect";s.style.color="";}},6000);
           });
       }
     });
   }
+
+  tryLoad();
 }());
 
 /* ── MODAL + NAV + SCROLL REVEAL ─────────────────────────── */
 document.addEventListener("DOMContentLoaded", function() {
-  var tryDemoBtn = document.getElementById("tryDemoBtn");
-  var ctaBtn     = document.getElementById("ctaDemoBtn");
-  var navBtn     = document.getElementById("navGetStarted");
-  var demoModal  = document.getElementById("demoModal");
-  var closeBtn   = document.getElementById("modalCloseBtn");
+  var tryDemoBtn=document.getElementById("tryDemoBtn");
+  var ctaBtn=document.getElementById("ctaDemoBtn");
+  var navBtn=document.getElementById("navGetStarted");
+  var demoModal=document.getElementById("demoModal");
+  var closeBtn=document.getElementById("modalCloseBtn");
 
   function openModal(triggerBtn) {
-    if (triggerBtn && !triggerBtn.disabled) {
-      triggerBtn.dataset.origHtml = triggerBtn.innerHTML;
-      triggerBtn.innerHTML = '<span class="btn-spinner"></span>Connecting...';
-      triggerBtn.classList.add("connecting");
-      triggerBtn.disabled = true;
-    }
-    setTimeout(function() {
-      if (demoModal) {
-        demoModal.classList.remove("hidden");
-        document.body.style.overflow = "hidden";
-        requestAnimationFrame(function() { requestAnimationFrame(function() { demoModal.classList.add("modal-visible"); }); });
-      }
-    }, 1500);
+    if(triggerBtn&&!triggerBtn.disabled){triggerBtn.dataset.origHtml=triggerBtn.innerHTML;triggerBtn.innerHTML='<span class="btn-spinner"></span>Connecting...';triggerBtn.classList.add("connecting");triggerBtn.disabled=true;}
+    setTimeout(function(){
+      if(demoModal){demoModal.classList.remove("hidden");document.body.style.overflow="hidden";
+        requestAnimationFrame(function(){requestAnimationFrame(function(){demoModal.classList.add("modal-visible");});});}
+    },1500);
   }
 
   function closeModal() {
-    if (demoModal) {
-      demoModal.classList.remove("modal-visible");
-      document.body.style.overflow = "";
-      demoModal.addEventListener("transitionend", function h() { demoModal.classList.add("hidden"); demoModal.removeEventListener("transitionend", h); });
-    }
-    var cb = document.getElementById("callBtn");
-    if (cb) { cb.innerText = "Call"; cb.style.background = ""; cb.className = "vapi-call-btn btn-green"; cb.disabled = false; cb.classList.remove("active"); }
-    var sub = document.getElementById("callSubtitle"); if (sub) { sub.innerText = "Ready to connect"; sub.style.color = ""; }
-    var s  = document.getElementById("vapiScreen");       if (s)  s.className = "modal-screen-content vapi-call-state-idle";
-    var iv = document.getElementById("vapiIdleVisual");   if (iv) iv.style.display = "flex";
-    var av = document.getElementById("vapiActiveVisual"); if (av) av.style.display = "none";
-    var t  = document.getElementById("vapiTimer");        if (t)  { t.classList.add("hidden-elm"); t.textContent = "00:00"; }
-    var lb = document.getElementById("vapiBtnLabel");     if (lb) lb.innerText = "Call Ansa AI";
-    setTimeout(function() {
-      document.querySelectorAll("[data-orig-html]").forEach(function(b) { b.innerHTML = b.dataset.origHtml; delete b.dataset.origHtml; b.classList.remove("connecting"); b.disabled = false; });
-    }, 380);
+    if(demoModal){demoModal.classList.remove("modal-visible");document.body.style.overflow="";
+      demoModal.addEventListener("transitionend",function h(){demoModal.classList.add("hidden");demoModal.removeEventListener("transitionend",h);});}
+    var cb=document.getElementById("callBtn");
+    if(cb){cb.innerText="Call";cb.style.background="";cb.className="vapi-call-btn btn-green";cb.disabled=false;cb.classList.remove("active");}
+    var sub=document.getElementById("callSubtitle");if(sub){sub.innerText="Ready to connect";sub.style.color="";}
+    var s=document.getElementById("vapiScreen");if(s)s.className="modal-screen-content vapi-call-state-idle";
+    var iv=document.getElementById("vapiIdleVisual");if(iv)iv.style.display="flex";
+    var av=document.getElementById("vapiActiveVisual");if(av)av.style.display="none";
+    var t=document.getElementById("vapiTimer");if(t){t.classList.add("hidden-elm");t.textContent="00:00";}
+    var lb=document.getElementById("vapiBtnLabel");if(lb)lb.innerText="Call Ansa AI";
+    setTimeout(function(){document.querySelectorAll("[data-orig-html]").forEach(function(b){b.innerHTML=b.dataset.origHtml;delete b.dataset.origHtml;b.classList.remove("connecting");b.disabled=false;});},380);
   }
 
-  if (tryDemoBtn) tryDemoBtn.addEventListener("click", function(e) { e.preventDefault(); openModal(tryDemoBtn); });
-  if (ctaBtn)     ctaBtn.addEventListener("click",     function(e) { e.preventDefault(); openModal(ctaBtn); });
-  if (navBtn)     navBtn.addEventListener("click",     function()  { openModal(navBtn); });
-  document.querySelectorAll(".price-btn").forEach(function(b) { b.addEventListener("click", function(e) { e.preventDefault(); openModal(b); }); });
-  if (closeBtn) closeBtn.addEventListener("click", closeModal);
-  if (demoModal) demoModal.addEventListener("click", function(e) { if (e.target === demoModal) closeModal(); });
-  document.addEventListener("keydown", function(e) { if (e.key === "Escape" && demoModal && !demoModal.classList.contains("hidden")) closeModal(); });
+  if(tryDemoBtn)tryDemoBtn.addEventListener("click",function(e){e.preventDefault();openModal(tryDemoBtn);});
+  if(ctaBtn)ctaBtn.addEventListener("click",function(e){e.preventDefault();openModal(ctaBtn);});
+  if(navBtn)navBtn.addEventListener("click",function(){openModal(navBtn);});
+  document.querySelectorAll(".price-btn").forEach(function(b){b.addEventListener("click",function(e){e.preventDefault();openModal(b);});});
+  if(closeBtn)closeBtn.addEventListener("click",closeModal);
+  if(demoModal)demoModal.addEventListener("click",function(e){if(e.target===demoModal)closeModal();});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape"&&demoModal&&!demoModal.classList.contains("hidden"))closeModal();});
 
-  /* Nav */
-  var navEl = document.getElementById("nav");
-  if (navEl) window.addEventListener("scroll", function() { navEl.classList.toggle("scrolled", window.scrollY > 40); }, { passive: true });
-  var navSections = ["solutions","pricing","company","cta"];
-  var navLinks = document.querySelectorAll(".nav-links a");
-  window.addEventListener("scroll", function() {
-    var cur = ""; navSections.forEach(function(id) { var el = document.getElementById(id); if (el && window.scrollY >= el.offsetTop - 130) cur = id; });
-    navLinks.forEach(function(a) { a.classList.toggle("active", a.getAttribute("href") === "#" + cur); });
-  }, { passive: true });
-  navLinks.forEach(function(l) { l.addEventListener("click", function(e) { var h = l.getAttribute("href"); if (h && h.startsWith("#")) { e.preventDefault(); var t = document.querySelector(h); if (t) t.scrollIntoView({ behavior: "smooth" }); } }); });
-  document.querySelectorAll('a[href="#hero"],a.footer-brand').forEach(function(a) { a.addEventListener("click", function(e) { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }); });
+  var navEl=document.getElementById("nav");
+  if(navEl)window.addEventListener("scroll",function(){navEl.classList.toggle("scrolled",window.scrollY>40);},{passive:true});
+  var secs=["solutions","pricing","company","cta"];
+  var nls=document.querySelectorAll(".nav-links a");
+  window.addEventListener("scroll",function(){var c="";secs.forEach(function(id){var el=document.getElementById(id);if(el&&window.scrollY>=el.offsetTop-130)c=id;});nls.forEach(function(a){a.classList.toggle("active",a.getAttribute("href")==="#"+c);});},{passive:true});
+  nls.forEach(function(l){l.addEventListener("click",function(e){var h=l.getAttribute("href");if(h&&h.startsWith("#")){e.preventDefault();var t=document.querySelector(h);if(t)t.scrollIntoView({behavior:"smooth"});}});});
+  document.querySelectorAll('a[href="#hero"],a.footer-brand').forEach(function(a){a.addEventListener("click",function(e){e.preventDefault();window.scrollTo({top:0,behavior:"smooth"});});});
 
-  /* Mobile nav */
-  var hbg = document.getElementById("navHamburger");
-  var mnv = document.getElementById("mobileNav");
-  function cmn() { hbg.classList.remove("open"); hbg.setAttribute("aria-expanded","false"); mnv.classList.remove("open"); mnv.setAttribute("aria-hidden","true"); }
-  hbg.addEventListener("click", function(e) { e.stopPropagation(); var o = mnv.classList.toggle("open"); hbg.classList.toggle("open",o); hbg.setAttribute("aria-expanded",o); mnv.setAttribute("aria-hidden",!o); });
-  document.addEventListener("click", function(e) { if (!hbg.contains(e.target) && !mnv.contains(e.target)) cmn(); });
-  mnv.querySelectorAll("a").forEach(function(l) { l.addEventListener("click", function(e) { var h = l.getAttribute("href"); if (h && h.startsWith("#")) { e.preventDefault(); cmn(); setTimeout(function() { var t = document.querySelector(h); if (t) t.scrollIntoView({ behavior: "smooth" }); }, 200); } }); });
-  document.getElementById("mobileGetStarted").addEventListener("click", function() { cmn(); setTimeout(function() { document.getElementById("cta").scrollIntoView({ behavior: "smooth" }); }, 200); });
+  var hbg=document.getElementById("navHamburger"),mnv=document.getElementById("mobileNav");
+  function cmn(){hbg.classList.remove("open");hbg.setAttribute("aria-expanded","false");mnv.classList.remove("open");mnv.setAttribute("aria-hidden","true");}
+  hbg.addEventListener("click",function(e){e.stopPropagation();var o=mnv.classList.toggle("open");hbg.classList.toggle("open",o);hbg.setAttribute("aria-expanded",o);mnv.setAttribute("aria-hidden",!o);});
+  document.addEventListener("click",function(e){if(!hbg.contains(e.target)&&!mnv.contains(e.target))cmn();});
+  mnv.querySelectorAll("a").forEach(function(l){l.addEventListener("click",function(e){var h=l.getAttribute("href");if(h&&h.startsWith("#")){e.preventDefault();cmn();setTimeout(function(){var t=document.querySelector(h);if(t)t.scrollIntoView({behavior:"smooth"});},200);}});});
+  document.getElementById("mobileGetStarted").addEventListener("click",function(){cmn();setTimeout(function(){document.getElementById("cta").scrollIntoView({behavior:"smooth"});},200);});
 
-  /* Scroll reveal */
-  document.querySelectorAll(".reveal").forEach(function(el) { if (el.getBoundingClientRect().top > window.innerHeight + 50) el.classList.add("animate-in"); });
-  if ("IntersectionObserver" in window) {
-    var io = new IntersectionObserver(function(entries) { entries.forEach(function(e) { if (e.isIntersecting) { e.target.classList.remove("animate-in"); e.target.classList.add("visible"); io.unobserve(e.target); } }); }, { threshold: 0.05, rootMargin: "0px 0px -10px 0px" });
-    document.querySelectorAll(".reveal.animate-in").forEach(function(el) { io.observe(el); });
-  }
+  document.querySelectorAll(".reveal").forEach(function(el){if(el.getBoundingClientRect().top>window.innerHeight+50)el.classList.add("animate-in");});
+  if("IntersectionObserver"in window){var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.remove("animate-in");e.target.classList.add("visible");io.unobserve(e.target);}});},{threshold:0.05,rootMargin:"0px 0px -10px 0px"});document.querySelectorAll(".reveal.animate-in").forEach(function(el){io.observe(el);});}
 });
 </script>
 </body>
