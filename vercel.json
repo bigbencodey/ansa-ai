@@ -5,7 +5,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' cdn.jsdelivr.net unpkg.com; connect-src 'self' *.vapi.ai wss://*.vapi.ai; media-src 'self' blob: mediastream:; microphone 'self'"
+          "value": "default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline'; font-src * data:; connect-src * wss:; media-src * blob: mediastream:"
         }
       ]
     }
