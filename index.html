@@ -10,8 +10,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<!-- Vapi Web SDK — loaded before any script so window.Vapi is available -->
-<script src="https://cdn.jsdelivr.net/npm/@vapi-ai/web/dist/vapi.min.js"></script>
 <style>
 /* ============================================================
    RESET & DESIGN TOKENS
@@ -21,7 +19,6 @@
   --black:#050508;
   --surface:#08080d;
   --blue:#2563ff;
-  --blue-glow:rgba(37,99,255,0.55);
   --white:#f4f6ff;
   --muted:rgba(200,212,245,0.45);
   --section-pad:130px 56px;
@@ -29,93 +26,36 @@
   --radius-card:22px;
 }
 html{scroll-behavior:smooth}
-body{
-  background:var(--black);color:var(--white);
-  font-family:'Poppins',sans-serif;
-  overflow-x:hidden;-webkit-font-smoothing:antialiased;
-}
-body::after{
-  content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:0.028;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size:256px 256px;
-}
-.bg-ambient{
-  position:fixed;inset:0;pointer-events:none;z-index:0;
-  background:
-    radial-gradient(ellipse 80% 55% at 68% 38%,rgba(18,38,115,0.2) 0%,transparent 62%),
-    radial-gradient(ellipse 50% 40% at 85% 78%,rgba(37,99,255,0.08) 0%,transparent 55%),
-    radial-gradient(ellipse 55% 45% at 8% 62%,rgba(10,20,80,0.13) 0%,transparent 60%);
-}
+body{background:var(--black);color:var(--white);font-family:'Poppins',sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased;}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:0.028;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:256px 256px;}
+.bg-ambient{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 80% 55% at 68% 38%,rgba(18,38,115,0.2) 0%,transparent 62%),radial-gradient(ellipse 50% 40% at 85% 78%,rgba(37,99,255,0.08) 0%,transparent 55%),radial-gradient(ellipse 55% 45% at 8% 62%,rgba(10,20,80,0.13) 0%,transparent 60%);}
 
 /* ============================================================
    NAVIGATION
 ============================================================ */
-nav{
-  position:fixed;top:0;left:0;right:0;z-index:300;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 56px;height:68px;
-  background:rgba(5,5,8,0.72);
-  backdrop-filter:blur(28px) saturate(160%);-webkit-backdrop-filter:blur(28px) saturate(160%);
-  border-bottom:0.5px solid rgba(255,255,255,0.055);
-  transition:background 0.3s;
-}
+nav{position:fixed;top:0;left:0;right:0;z-index:300;display:flex;align-items:center;justify-content:space-between;padding:0 56px;height:68px;background:rgba(5,5,8,0.72);backdrop-filter:blur(28px) saturate(160%);-webkit-backdrop-filter:blur(28px) saturate(160%);border-bottom:0.5px solid rgba(255,255,255,0.055);transition:background 0.3s;}
 nav.scrolled{background:rgba(5,5,8,0.92)}
 .nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0}
 .nav-name{font-weight:600;font-size:15px;color:var(--white);letter-spacing:-0.01em}
 .nav-links{display:flex;gap:38px;list-style:none}
-.nav-links a{
-  text-decoration:none;font-size:13.5px;font-weight:400;color:var(--muted);
-  letter-spacing:0.01em;position:relative;padding-bottom:3px;transition:color 0.25s;
-}
-.nav-links a::after{
-  content:'';position:absolute;bottom:0;left:0;width:0;height:1px;
-  background:rgba(255,255,255,0.65);border-radius:1px;
-  transition:width 0.32s cubic-bezier(0.22,1,0.36,1);
-}
+.nav-links a{text-decoration:none;font-size:13.5px;font-weight:400;color:var(--muted);letter-spacing:0.01em;position:relative;padding-bottom:3px;transition:color 0.25s;}
+.nav-links a::after{content:'';position:absolute;bottom:0;left:0;width:0;height:1px;background:rgba(255,255,255,0.65);border-radius:1px;transition:width 0.32s cubic-bezier(0.22,1,0.36,1);}
 .nav-links a:hover,.nav-links a.active{color:var(--white)}
 .nav-links a:hover::after,.nav-links a.active::after{width:100%}
 .nav-links a.active::after{background:rgba(255,255,255,0.42)}
-.nav-cta{
-  font-family:'Poppins',sans-serif;font-size:13px;font-weight:500;
-  color:var(--black);background:var(--white);border:none;border-radius:100px;
-  padding:9px 22px;cursor:pointer;letter-spacing:0.01em;
-  transition:opacity 0.2s,transform 0.15s;flex-shrink:0;
-}
+.nav-cta{font-family:'Poppins',sans-serif;font-size:13px;font-weight:500;color:var(--black);background:var(--white);border:none;border-radius:100px;padding:9px 22px;cursor:pointer;letter-spacing:0.01em;transition:opacity 0.2s,transform 0.15s;flex-shrink:0;}
 .nav-cta:hover{opacity:0.88;transform:scale(1.02)}
-.nav-hamburger{
-  display:none;flex-direction:column;justify-content:center;align-items:center;
-  gap:5px;width:36px;height:36px;
-  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
-  border-radius:8px;cursor:pointer;flex-shrink:0;
-}
-.nav-hamburger span{
-  display:block;width:16px;height:1.5px;
-  background:rgba(255,255,255,0.8);border-radius:2px;
-  transition:transform 0.25s,opacity 0.25s;
-}
+.nav-hamburger{display:none;flex-direction:column;justify-content:center;align-items:center;gap:5px;width:36px;height:36px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;cursor:pointer;flex-shrink:0;}
+.nav-hamburger span{display:block;width:16px;height:1.5px;background:rgba(255,255,255,0.8);border-radius:2px;transition:transform 0.25s,opacity 0.25s;}
 .nav-hamburger.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
 .nav-hamburger.open span:nth-child(2){opacity:0}
 .nav-hamburger.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
-.mobile-nav{
-  display:none;position:fixed;top:60px;left:0;right:0;z-index:290;
-  background:rgba(5,5,8,0.97);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
-  border-bottom:0.5px solid rgba(255,255,255,0.08);padding:20px 24px 28px;
-  opacity:0;transform:translateY(-6px);pointer-events:none;
-  transition:opacity 0.28s cubic-bezier(0.22,1,0.36,1),transform 0.28s cubic-bezier(0.22,1,0.36,1);
-}
+.mobile-nav{display:none;position:fixed;top:60px;left:0;right:0;z-index:290;background:rgba(5,5,8,0.97);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:0.5px solid rgba(255,255,255,0.08);padding:20px 24px 28px;opacity:0;transform:translateY(-6px);pointer-events:none;transition:opacity 0.28s cubic-bezier(0.22,1,0.36,1),transform 0.28s cubic-bezier(0.22,1,0.36,1);}
 .mobile-nav.open{opacity:1;transform:translateY(0);pointer-events:auto}
 .mobile-nav ul{list-style:none;display:flex;flex-direction:column;gap:2px;margin-bottom:16px}
-.mobile-nav ul a{
-  display:block;padding:13px 10px;font-size:16px;font-weight:500;color:var(--muted);
-  text-decoration:none;letter-spacing:0.01em;border-radius:10px;
-  transition:color 0.2s,background 0.2s;
-}
+.mobile-nav ul a{display:block;padding:13px 10px;font-size:16px;font-weight:500;color:var(--muted);text-decoration:none;letter-spacing:0.01em;border-radius:10px;transition:color 0.2s,background 0.2s;}
 .mobile-nav ul a:hover{color:var(--white);background:rgba(255,255,255,0.05)}
-.mobile-nav-cta{
-  width:100%;padding:14px;background:var(--white);color:var(--black);
-  border:none;border-radius:100px;font-family:'Poppins',sans-serif;
-  font-size:14px;font-weight:600;cursor:pointer;letter-spacing:0.01em;transition:opacity 0.2s;
-}
+.mobile-nav-cta{width:100%;padding:14px;background:var(--white);color:var(--black);border:none;border-radius:100px;font-family:'Poppins',sans-serif;font-size:14px;font-weight:600;cursor:pointer;letter-spacing:0.01em;transition:opacity 0.2s;}
 .mobile-nav-cta:hover{opacity:0.88}
 
 /* ============================================================
@@ -135,54 +75,19 @@ nav.scrolled{background:rgba(5,5,8,0.92)}
 /* ============================================================
    HERO
 ============================================================ */
-#hero{
-  position:relative;z-index:1;min-height:100vh;
-  display:grid;grid-template-columns:1fr 1fr;align-items:center;
-  padding:100px 56px 60px;max-width:var(--max-w);margin:0 auto;
-}
+#hero{position:relative;z-index:1;min-height:100vh;display:grid;grid-template-columns:1fr 1fr;align-items:center;padding:100px 56px 60px;max-width:var(--max-w);margin:0 auto;}
 .hero-left{padding-right:28px;padding-bottom:40px;position:relative;z-index:10}
-.pill-tag{
-  display:inline-flex;align-items:center;gap:8px;
-  font-size:10.5px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;
-  color:rgba(158,185,255,0.88);border:1px solid rgba(78,118,255,0.28);
-  background:rgba(20,38,118,0.22);border-radius:100px;padding:7px 18px;margin-bottom:28px;
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-}
+.pill-tag{display:inline-flex;align-items:center;gap:8px;font-size:10.5px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:rgba(158,185,255,0.88);border:1px solid rgba(78,118,255,0.28);background:rgba(20,38,118,0.22);border-radius:100px;padding:7px 18px;margin-bottom:28px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);}
 .pill-dot{width:5px;height:5px;background:#5b8aff;border-radius:50%;animation:pdot 2.5s ease-in-out infinite}
 @keyframes pdot{0%,100%{opacity:1}50%{opacity:0.25}}
 h1{font-weight:700;font-size:clamp(32px,3.5vw,50px);line-height:1.13;letter-spacing:-0.025em;color:var(--white);margin-bottom:22px}
 .hero-desc{font-size:15px;font-weight:300;line-height:1.82;color:var(--muted);max-width:400px;margin-bottom:44px;letter-spacing:0.01em}
-.demo-form{
-  display:flex;align-items:center;
-  background:rgba(8,10,26,0.5);border:1px solid rgba(255,255,255,0.09);
-  border-radius:100px;padding:5px 5px 5px 22px;
-  max-width:480px;position:relative;z-index:10;
-  backdrop-filter:blur(22px) saturate(160%);-webkit-backdrop-filter:blur(22px) saturate(160%);
-  transition:border-color 0.3s,box-shadow 0.3s;
-}
+.demo-form{display:flex;align-items:center;background:rgba(8,10,26,0.5);border:1px solid rgba(255,255,255,0.09);border-radius:100px;padding:5px 5px 5px 22px;max-width:480px;position:relative;z-index:10;backdrop-filter:blur(22px) saturate(160%);-webkit-backdrop-filter:blur(22px) saturate(160%);transition:border-color 0.3s,box-shadow 0.3s;}
 .demo-form:focus-within{border-color:rgba(37,99,255,0.4)}
-.demo-form::before{
-  content:'';position:absolute;inset:-1px;border-radius:100px;
-  background:linear-gradient(135deg,rgba(37,99,255,0.18),transparent 50%);
-  z-index:-1;pointer-events:none;
-}
-.demo-input{
-  flex:1;background:transparent;border:none;outline:none;
-  font-family:'Poppins',sans-serif;font-size:14px;font-weight:400;
-  color:var(--white);min-width:0;letter-spacing:0.01em;
-}
+.demo-form::before{content:'';position:absolute;inset:-1px;border-radius:100px;background:linear-gradient(135deg,rgba(37,99,255,0.18),transparent 50%);z-index:-1;pointer-events:none;}
+.demo-input{flex:1;background:transparent;border:none;outline:none;font-family:'Poppins',sans-serif;font-size:14px;font-weight:400;color:var(--white);min-width:0;letter-spacing:0.01em;}
 .demo-input::placeholder{color:rgba(180,198,238,0.28)}
-
-/* ── shared blue button ── */
-.btn-blue{
-  flex-shrink:0;
-  background:linear-gradient(135deg,#1842ee 0%,#2563ff 45%,#4d8cf5 100%);
-  color:#fff;border:none;border-radius:100px;
-  font-family:'Poppins',sans-serif;font-weight:600;letter-spacing:0.02em;
-  cursor:pointer;position:relative;overflow:hidden;
-  box-shadow:0 0 0 1px rgba(100,155,255,0.22),0 0 26px rgba(37,99,255,0.62),0 0 65px rgba(37,99,255,0.22),0 4px 18px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.2),inset 0 -1px 0 rgba(0,0,38,0.28);
-  transition:transform 0.18s cubic-bezier(0.22,1,0.36,1),box-shadow 0.22s;
-}
+.btn-blue{flex-shrink:0;background:linear-gradient(135deg,#1842ee 0%,#2563ff 45%,#4d8cf5 100%);color:#fff;border:none;border-radius:100px;font-family:'Poppins',sans-serif;font-weight:600;letter-spacing:0.02em;cursor:pointer;position:relative;overflow:hidden;box-shadow:0 0 0 1px rgba(100,155,255,0.22),0 0 26px rgba(37,99,255,0.62),0 0 65px rgba(37,99,255,0.22),0 4px 18px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.2),inset 0 -1px 0 rgba(0,0,38,0.28);transition:transform 0.18s cubic-bezier(0.22,1,0.36,1),box-shadow 0.22s;}
 .btn-blue::before{content:'';position:absolute;top:0;left:0;right:0;height:50%;background:linear-gradient(180deg,rgba(255,255,255,0.16) 0%,transparent 100%);border-radius:inherit;pointer-events:none}
 .btn-blue::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.07) 0%,transparent 55%);border-radius:inherit;pointer-events:none}
 .btn-blue:hover{transform:translateY(-1px) scale(1.02);box-shadow:0 0 0 1px rgba(100,155,255,0.28),0 0 40px rgba(37,99,255,0.78),0 0 95px rgba(37,99,255,0.3),0 8px 26px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.22),inset 0 -1px 0 rgba(0,0,38,0.28)}
@@ -194,15 +99,7 @@ h1{font-weight:700;font-size:clamp(32px,3.5vw,50px);line-height:1.13;letter-spac
 .cta-btn-primary:hover svg{transform:translateX(3px)}
 .btn-spinner{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,0.3);border-top-color:rgba(255,255,255,0.9);border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0;vertical-align:middle;margin-right:6px}
 @keyframes spin{to{transform:rotate(360deg)}}
-
-/* pricing ghost button */
-.price-btn-ghost{
-  width:100%;padding:13px;border-radius:100px;font-family:'Poppins',sans-serif;
-  font-size:13px;font-weight:500;cursor:pointer;letter-spacing:0.02em;
-  background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);
-  color:var(--white);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  transition:transform 0.18s,background 0.18s;position:relative;overflow:hidden;
-}
+.price-btn-ghost{width:100%;padding:13px;border-radius:100px;font-family:'Poppins',sans-serif;font-size:13px;font-weight:500;cursor:pointer;letter-spacing:0.02em;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:var(--white);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);transition:transform 0.18s,background 0.18s;position:relative;overflow:hidden;}
 .price-btn-ghost:hover{transform:scale(1.02);background:rgba(255,255,255,0.08)}
 .price-btn-ghost.connecting{opacity:0.7;cursor:not-allowed;pointer-events:none}
 
@@ -214,29 +111,10 @@ h1{font-weight:700;font-size:clamp(32px,3.5vw,50px);line-height:1.13;letter-spac
 .bg-orb-1{width:420px;height:420px;top:50%;left:50%;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(37,99,255,0.11) 0%,transparent 70%)}
 .bg-orb-2{width:280px;height:280px;top:50%;left:50%;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(59,130,246,0.07) 0%,transparent 70%);animation:orbpulse 4.5s ease-in-out infinite}
 @keyframes orbpulse{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.14)}}
-.bg-dots{
-  position:absolute;inset:0;opacity:0.16;
-  background-image:radial-gradient(circle,rgba(100,140,255,0.55) 1px,transparent 1px);
-  background-size:28px 28px;
-  -webkit-mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 35%,transparent 78%);
-  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 35%,transparent 78%);
-}
-.phone-wrap{
-  position:absolute;top:50%;left:50%;
-  transform:translate(-46%,-50%) perspective(1200px) rotateY(-12deg) rotateX(3deg);
-  width:224px;animation:phonefloat 7s ease-in-out infinite;z-index:10;
-}
-@keyframes phonefloat{
-  0%,100%{transform:translate(-46%,-50%) perspective(1200px) rotateY(-12deg) rotateX(3deg) translateY(0)}
-  50%{transform:translate(-46%,-50%) perspective(1200px) rotateY(-12deg) rotateX(3deg) translateY(-10px)}
-}
-.phone-frame{
-  width:224px;border-radius:38px;
-  background:linear-gradient(160deg,#29292d 0%,#1b1b1f 40%,#111115 100%);
-  border:1px solid rgba(255,255,255,0.11);
-  box-shadow:-8px 12px 58px rgba(0,0,0,0.75),-3px 4px 18px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.1);
-  padding:10px;position:relative;overflow:hidden;
-}
+.bg-dots{position:absolute;inset:0;opacity:0.16;background-image:radial-gradient(circle,rgba(100,140,255,0.55) 1px,transparent 1px);background-size:28px 28px;-webkit-mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 35%,transparent 78%);mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 35%,transparent 78%);}
+.phone-wrap{position:absolute;top:50%;left:50%;transform:translate(-46%,-50%) perspective(1200px) rotateY(-12deg) rotateX(3deg);width:224px;animation:phonefloat 7s ease-in-out infinite;z-index:10;}
+@keyframes phonefloat{0%,100%{transform:translate(-46%,-50%) perspective(1200px) rotateY(-12deg) rotateX(3deg) translateY(0)}50%{transform:translate(-46%,-50%) perspective(1200px) rotateY(-12deg) rotateX(3deg) translateY(-10px)}}
+.phone-frame{width:224px;border-radius:38px;background:linear-gradient(160deg,#29292d 0%,#1b1b1f 40%,#111115 100%);border:1px solid rgba(255,255,255,0.11);box-shadow:-8px 12px 58px rgba(0,0,0,0.75),-3px 4px 18px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.1);padding:10px;position:relative;overflow:hidden;}
 .phone-frame::before{content:'';position:absolute;top:0;left:0;bottom:0;width:2px;background:linear-gradient(180deg,rgba(255,255,255,0.2) 0%,rgba(255,255,255,0.05) 40%,transparent 100%);border-radius:38px 0 0 38px}
 .phone-screen{background:linear-gradient(160deg,#191420 0%,#0f1018 50%,#08090e 100%);border-radius:28px;overflow:hidden;aspect-ratio:9/19.5;position:relative}
 .dyn-island{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:88px;height:25px;background:#000;border-radius:20px;z-index:5}
@@ -259,13 +137,7 @@ h1{font-weight:700;font-size:clamp(32px,3.5vw,50px);line-height:1.13;letter-spac
 .call-btn-label{font-size:8.5px;color:rgba(255,255,255,0.42);letter-spacing:0.02em}
 .call-btn-end{display:flex;align-items:center;justify-content:center;width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#dc2626,#ef4444);box-shadow:0 4px 18px rgba(220,38,38,0.42);margin:0 auto;position:relative;z-index:1}
 .call-btn-end svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round}
-.float-icon{
-  position:absolute;background:rgba(6,8,22,0.52);
-  backdrop-filter:blur(26px) saturate(180%);-webkit-backdrop-filter:blur(26px) saturate(180%);
-  border:1px solid rgba(255,255,255,0.1);border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 0 0 1px rgba(255,255,255,0.04) inset,0 1px 0 rgba(255,255,255,0.1) inset,0 12px 38px rgba(0,0,0,0.5);
-}
+.float-icon{position:absolute;background:rgba(6,8,22,0.52);backdrop-filter:blur(26px) saturate(180%);-webkit-backdrop-filter:blur(26px) saturate(180%);border:1px solid rgba(255,255,255,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 1px rgba(255,255,255,0.04) inset,0 1px 0 rgba(255,255,255,0.1) inset,0 12px 38px rgba(0,0,0,0.5);}
 .float-icon svg{stroke:rgba(195,218,255,0.72);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 .fi-phone{width:76px;height:76px;top:88px;left:26px;animation:fi1 5s ease-in-out infinite;border-color:rgba(37,99,255,0.24)}
 @keyframes fi1{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
@@ -291,7 +163,8 @@ h1{font-weight:700;font-size:clamp(32px,3.5vw,50px);line-height:1.13;letter-spac
 .a3{animation:fadeUp 0.8s cubic-bezier(0.22,1,0.36,1) .2s both}
 .a4{animation:fadeUp 0.8s cubic-bezier(0.22,1,0.36,1) .32s both}
 .a-scene{animation:fadeIn 1s cubic-bezier(0.22,1,0.36,1) .28s both}
-.reveal{opacity:0;transform:translateY(30px);transition:opacity 0.7s cubic-bezier(0.22,1,0.36,1),transform 0.7s cubic-bezier(0.22,1,0.36,1)}
+.reveal{transition:opacity 0.7s cubic-bezier(0.22,1,0.36,1),transform 0.7s cubic-bezier(0.22,1,0.36,1)}
+.reveal.animate-in{opacity:0;transform:translateY(30px)}
 .reveal.visible{opacity:1;transform:translateY(0)}
 .reveal-delay-1{transition-delay:.08s}
 .reveal-delay-2{transition-delay:.16s}
@@ -371,299 +244,64 @@ footer{background:var(--black);border-top:0.5px solid rgba(255,255,255,0.055);pa
    DEMO MODAL — VAPI 3D TITANIUM PHONE
 ============================================================ */
 .hidden{display:none !important}
-
-/* ── OVERLAY: deep-space studio lighting ── */
-#demoModal{
-  position:fixed;inset:0;z-index:9000;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  height:100vh;overflow:hidden;
-  background:rgba(10,10,12,0.88);
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  /* studio radial: muted midnight blue center → absolute black edges */
-  background:
-    radial-gradient(ellipse 65% 65% at 50% 50%, rgba(10,16,48,0.95) 0%, rgba(4,4,12,0.98) 50%, rgba(0,0,2,1) 100%);
-  opacity:0;transition:opacity 0.45s cubic-bezier(0.22,1,0.36,1);
-}
+#demoModal{position:fixed;inset:0;z-index:9000;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;overflow:hidden;background:radial-gradient(ellipse 65% 65% at 50% 50%,rgba(10,16,48,0.95) 0%,rgba(4,4,12,0.98) 50%,rgba(0,0,2,1) 100%);opacity:0;transition:opacity 0.45s cubic-bezier(0.22,1,0.36,1);}
 #demoModal.modal-visible{opacity:1}
-
-/* ── CLOSE BUTTON ── */
-.modal-close{
-  position:absolute;top:22px;right:22px;
-  width:36px;height:36px;border-radius:50%;
-  background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;color:rgba(255,255,255,0.45);z-index:10;
-  transition:background 0.2s,color 0.2s,transform 0.15s;
-}
+.modal-close{position:absolute;top:22px;right:22px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(255,255,255,0.45);z-index:10;transition:background 0.2s,color 0.2s,transform 0.15s;}
 .modal-close:hover{background:rgba(255,255,255,0.11);color:rgba(255,255,255,0.9);transform:scale(1.08)}
 .modal-close svg{width:12px;height:12px;stroke:currentColor;stroke-width:2;stroke-linecap:round;fill:none}
-
-/* ── LEVITATING ASSEMBLY ── */
-.modal-assembly{
-  display:flex;flex-direction:column;align-items:center;gap:20px;
-  animation:phoneLevitate 4s ease-in-out infinite;
-}
-@keyframes phoneLevitate{
-  0%,100%{transform:translateY(0)}
-  50%    {transform:translateY(-10px)}
-}
-
-/* ── 3D SPACE-GRAY BEZEL ── */
-.modal-phone-outer{
-  position:relative;
-  width:320px;height:560px;
-  border-radius:44px;
-  padding:4px; /* physical bezel thickness */
-  /* brushed titanium gradient */
-  background:linear-gradient(155deg,
-    #dde0e8 0%, #b0b5c4 12%,
-    #636778 28%, #3a3d4d 42%,
-    #2a2a2e 50%,
-    #3d4050 60%, #696e80 72%,
-    #a8adbf 85%, #d8dce6 100%
-  );
-  box-shadow:
-    /* bezel inner rim */
-    inset 0 1px 0  rgba(255,255,255,0.22),
-    inset 0 -1px 0 rgba(0,0,0,0.6),
-    inset 1px 0 0  rgba(255,255,255,0.1),
-    inset -1px 0 0 rgba(0,0,0,0.45),
-    /* 3D stacked lift */
-    0 4px 0   rgba(0,0,0,0.65),
-    0 8px 0   rgba(0,0,0,0.38),
-    0 14px 0  rgba(0,0,0,0.2),
-    /* ambient blue glow */
-    0 0 50px  rgba(37,99,255,0.14),
-    0 0 100px rgba(37,99,255,0.07),
-    /* ground shadow */
-    0 36px 90px  rgba(0,0,0,0.75),
-    0 70px 130px rgba(0,0,0,0.4);
-}
-
-/* ── SCREEN BODY ── */
-.modal-phone-inner{
-  width:100%;height:100%;
-  border-radius:40px;
-  overflow:hidden;
-  background:#05060d;
-  position:relative;
-  display:flex;align-items:center;justify-content:center;
-  /* screen recessed into the bezel */
-  box-shadow:
-    inset 0 0 0 1px rgba(0,0,0,0.85),
-    inset 0 4px 16px rgba(0,0,0,0.95),
-    inset 0 -3px 10px rgba(0,0,0,0.7);
-}
-/* dynamic island */
-.modal-notch{
-  position:absolute;top:13px;left:50%;transform:translateX(-50%);
-  width:96px;height:28px;background:#000;border-radius:18px;z-index:6;
-  box-shadow:0 2px 10px rgba(0,0,0,0.9);
-}
-/* left chamfer sheen */
-.modal-phone-inner::before{
-  content:'';position:absolute;top:0;left:0;bottom:0;width:1.5px;
-  background:linear-gradient(180deg,rgba(255,255,255,0.16) 0%,rgba(255,255,255,0.06) 35%,transparent 80%);
-  border-radius:40px 0 0 40px;z-index:7;pointer-events:none;
-}
-/* top specular line */
-.modal-phone-inner::after{
-  content:'';position:absolute;top:0;left:8%;right:8%;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);
-  z-index:7;pointer-events:none;
-}
-
-/* ── PHONE SCREEN CONTENT (states live here) ── */
-.modal-screen-content{
-  position:absolute;inset:0;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:60px 24px 36px;
-  gap:0;
-  z-index:5;
-}
-
-/* ── STATE: IDLE — pulsing dot ── */
-.vapi-idle-visual{
-  position:relative;
-  display:flex;align-items:center;justify-content:center;
-  width:80px;height:80px;
-  margin-bottom:28px;
-}
-/* pulse rings */
-.vapi-idle-visual::before,.vapi-idle-visual::after{
-  content:'';position:absolute;border-radius:50%;
-  border:1px solid rgba(37,99,255,0.4);
-  animation:idlepulse 2.8s ease-out infinite;
-}
+.modal-assembly{display:flex;flex-direction:column;align-items:center;gap:20px;animation:phoneLevitate 4s ease-in-out infinite;}
+@keyframes phoneLevitate{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.modal-phone-outer{position:relative;width:320px;height:560px;border-radius:44px;padding:4px;background:linear-gradient(155deg,#dde0e8 0%,#b0b5c4 12%,#636778 28%,#3a3d4d 42%,#2a2a2e 50%,#3d4050 60%,#696e80 72%,#a8adbf 85%,#d8dce6 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,0.22),inset 0 -1px 0 rgba(0,0,0,0.6),inset 1px 0 0 rgba(255,255,255,0.1),inset -1px 0 0 rgba(0,0,0,0.45),0 4px 0 rgba(0,0,0,0.65),0 8px 0 rgba(0,0,0,0.38),0 14px 0 rgba(0,0,0,0.2),0 0 50px rgba(37,99,255,0.14),0 0 100px rgba(37,99,255,0.07),0 36px 90px rgba(0,0,0,0.75),0 70px 130px rgba(0,0,0,0.4);}
+.modal-phone-inner{width:100%;height:100%;border-radius:40px;overflow:hidden;background:#05060d;position:relative;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 1px rgba(0,0,0,0.85),inset 0 4px 16px rgba(0,0,0,0.95),inset 0 -3px 10px rgba(0,0,0,0.7);}
+.modal-notch{position:absolute;top:13px;left:50%;transform:translateX(-50%);width:96px;height:28px;background:#000;border-radius:18px;z-index:6;box-shadow:0 2px 10px rgba(0,0,0,0.9);}
+.modal-phone-inner::before{content:'';position:absolute;top:0;left:0;bottom:0;width:1.5px;background:linear-gradient(180deg,rgba(255,255,255,0.16) 0%,rgba(255,255,255,0.06) 35%,transparent 80%);border-radius:40px 0 0 40px;z-index:7;pointer-events:none;}
+.modal-phone-inner::after{content:'';position:absolute;top:0;left:8%;right:8%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);z-index:7;pointer-events:none;}
+.modal-screen-content{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 24px 36px;gap:0;z-index:5;}
+.vapi-idle-visual{position:relative;display:flex;align-items:center;justify-content:center;width:80px;height:80px;margin-bottom:28px;}
+.vapi-idle-visual::before,.vapi-idle-visual::after{content:'';position:absolute;border-radius:50%;border:1px solid rgba(37,99,255,0.4);animation:idlepulse 2.8s ease-out infinite;}
 .vapi-idle-visual::before{inset:0}
 .vapi-idle-visual::after{inset:-14px;animation-delay:0.7s}
-@keyframes idlepulse{
-  0%  {transform:scale(0.6);opacity:0}
-  20% {opacity:0.8}
-  100%{transform:scale(1);opacity:0}
-}
-.vapi-idle-dot{
-  width:22px;height:22px;border-radius:50%;
-  background:radial-gradient(circle at 38% 32%,rgba(110,160,255,0.9),rgba(37,99,255,0.95));
-  box-shadow:0 0 18px rgba(37,99,255,0.8),0 0 50px rgba(37,99,255,0.35);
-  animation:dotglow 2.8s ease-in-out infinite;
-  position:relative;z-index:2;
-}
-@keyframes dotglow{
-  0%,100%{box-shadow:0 0 18px rgba(37,99,255,0.8),0 0 50px rgba(37,99,255,0.35)}
-  50%    {box-shadow:0 0 28px rgba(37,99,255,1),0 0 70px rgba(37,99,255,0.55)}
-}
-
-/* ── STATE: ACTIVE — equalizer bars ── */
-.vapi-active-visual{
-  display:flex;align-items:center;gap:4px;
-  height:44px;margin-bottom:28px;
-}
-.vapi-eq-bar{
-  width:4px;border-radius:3px;
-  background:rgba(37,99,255,0.88);
-  animation:eqbar 0.8s ease-in-out infinite;
-  transform-origin:center bottom;
-}
-.vapi-eq-bar:nth-child(1){height:12px;animation-delay:0s}
-.vapi-eq-bar:nth-child(2){height:22px;animation-delay:.1s}
-.vapi-eq-bar:nth-child(3){height:36px;animation-delay:.05s}
-.vapi-eq-bar:nth-child(4){height:28px;animation-delay:.15s}
-.vapi-eq-bar:nth-child(5){height:40px;animation-delay:.08s}
-.vapi-eq-bar:nth-child(6){height:22px;animation-delay:.18s}
-.vapi-eq-bar:nth-child(7){height:16px;animation-delay:.03s}
-@keyframes eqbar{
-  0%,100%{transform:scaleY(1)}
-  50%    {transform:scaleY(0.2)}
-}
-/* paused when connecting */
+@keyframes idlepulse{0%{transform:scale(0.6);opacity:0}20%{opacity:0.8}100%{transform:scale(1);opacity:0}}
+.vapi-idle-dot{width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 38% 32%,rgba(110,160,255,0.9),rgba(37,99,255,0.95));box-shadow:0 0 18px rgba(37,99,255,0.8),0 0 50px rgba(37,99,255,0.35);animation:dotglow 2.8s ease-in-out infinite;position:relative;z-index:2;}
+@keyframes dotglow{0%,100%{box-shadow:0 0 18px rgba(37,99,255,0.8),0 0 50px rgba(37,99,255,0.35)}50%{box-shadow:0 0 28px rgba(37,99,255,1),0 0 70px rgba(37,99,255,0.55)}}
+.vapi-active-visual{display:flex;align-items:center;gap:4px;height:44px;margin-bottom:28px;}
+.vapi-eq-bar{width:4px;border-radius:3px;background:rgba(37,99,255,0.88);animation:eqbar 0.8s ease-in-out infinite;transform-origin:center bottom;}
+.vapi-eq-bar:nth-child(1){height:12px;animation-delay:0s}.vapi-eq-bar:nth-child(2){height:22px;animation-delay:.1s}.vapi-eq-bar:nth-child(3){height:36px;animation-delay:.05s}.vapi-eq-bar:nth-child(4){height:28px;animation-delay:.15s}.vapi-eq-bar:nth-child(5){height:40px;animation-delay:.08s}.vapi-eq-bar:nth-child(6){height:22px;animation-delay:.18s}.vapi-eq-bar:nth-child(7){height:16px;animation-delay:.03s}
+@keyframes eqbar{0%,100%{transform:scaleY(1)}50%{transform:scaleY(0.2)}}
 .vapi-call-state-connecting .vapi-eq-bar{animation-play-state:paused}
-
-/* ── CALLER INFO ── */
-.vapi-caller-label{
-  font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;
-  color:rgba(180,200,255,0.55);margin-bottom:6px;
-}
-.vapi-caller-name{
-  font-size:20px;font-weight:700;letter-spacing:-0.02em;
-  color:rgba(240,244,255,0.95);margin-bottom:4px;
-}
-.vapi-status-row{
-  display:flex;align-items:center;gap:7px;
-  font-size:11px;font-weight:400;letter-spacing:0.06em;
-  color:rgba(160,180,230,0.55);margin-bottom:32px;
-}
-.vapi-status-dot{
-  width:6px;height:6px;border-radius:50%;
-  background:rgba(120,140,220,0.6);flex-shrink:0;
-  transition:background 0.4s,box-shadow 0.4s;
-}
-/* active state: green dot */
-.vapi-call-state-active .vapi-status-dot{
-  background:#22c55e;
-  box-shadow:0 0 8px rgba(34,197,94,0.7);
-  animation:statusblink 1.4s ease-in-out infinite;
-}
+.vapi-caller-label{font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:rgba(180,200,255,0.55);margin-bottom:6px;}
+.vapi-caller-name{font-size:20px;font-weight:700;letter-spacing:-0.02em;color:rgba(240,244,255,0.95);margin-bottom:4px;}
+.vapi-status-row{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:400;letter-spacing:0.06em;color:rgba(160,180,230,0.55);margin-bottom:32px;}
+.vapi-status-dot{width:6px;height:6px;border-radius:50%;background:rgba(120,140,220,0.6);flex-shrink:0;transition:background 0.4s,box-shadow 0.4s;}
+.vapi-call-state-active .vapi-status-dot{background:#22c55e;box-shadow:0 0 8px rgba(34,197,94,0.7);animation:statusblink 1.4s ease-in-out infinite;}
 @keyframes statusblink{0%,100%{opacity:1}50%{opacity:0.35}}
 #vapiStatusText{transition:color 0.3s}
-
-/* call timer */
-.vapi-timer{
-  font-size:13px;font-weight:500;letter-spacing:0.12em;
-  color:rgba(255,255,255,0.28);
-  font-variant-numeric:tabular-nums;
-  min-height:18px;margin-bottom:28px;
-  transition:opacity 0.3s;
-}
+.vapi-timer{font-size:13px;font-weight:500;letter-spacing:0.12em;color:rgba(255,255,255,0.28);font-variant-numeric:tabular-nums;min-height:18px;margin-bottom:28px;transition:opacity 0.3s;}
 .vapi-timer.hidden-elm{opacity:0}
-
-/* ── CALL BUTTON ── */
-.vapi-btn-ring{
-  position:relative;width:72px;height:72px;
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;
-}
-.vapi-btn-ring::before,.vapi-btn-ring::after{
-  content:'';position:absolute;inset:0;border-radius:50%;
-  animation:btnhalo 2s ease-out infinite;
-}
+.vapi-btn-ring{position:relative;width:72px;height:72px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.vapi-btn-ring::before,.vapi-btn-ring::after{content:'';position:absolute;inset:0;border-radius:50%;animation:btnhalo 2s ease-out infinite;}
 .vapi-btn-ring::before{border:1.5px solid rgba(34,197,94,0.45)}
-.vapi-btn-ring::after {border:1.5px solid rgba(34,197,94,0.25);animation-delay:0.65s}
-@keyframes btnhalo{
-  0%  {transform:scale(1);opacity:0.9}
-  100%{transform:scale(1.85);opacity:0}
-}
-/* hide halos in non-idle states */
-.vapi-call-state-connecting .vapi-btn-ring::before,
-.vapi-call-state-connecting .vapi-btn-ring::after,
-.vapi-call-state-active .vapi-btn-ring::before,
-.vapi-call-state-active .vapi-btn-ring::after{
-  display:none;
-}
-
-.vapi-call-btn{
-  width:60px;height:60px;border-radius:50%;border:none;
-  cursor:pointer;position:relative;z-index:1;
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Poppins',sans-serif;font-size:10px;font-weight:600;
-  letter-spacing:0.06em;text-transform:uppercase;
-  transition:transform 0.18s cubic-bezier(0.22,1,0.36,1),box-shadow 0.22s,background 0.35s;
-  overflow:hidden;
-}
-.vapi-call-btn::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:50%;
-  background:linear-gradient(180deg,rgba(255,255,255,0.18),transparent);
-  border-radius:inherit;pointer-events:none;
-}
-/* IDLE / CONNECTING: green */
-.vapi-call-btn.btn-green{
-  background:linear-gradient(135deg,#16a34a,#22c55e);
-  color:#fff;
-  box-shadow:0 0 26px rgba(34,197,94,0.55),0 0 60px rgba(34,197,94,0.2),0 4px 18px rgba(0,0,0,0.45),inset 0 1px 0 rgba(255,255,255,0.2);
-}
+.vapi-btn-ring::after{border:1.5px solid rgba(34,197,94,0.25);animation-delay:0.65s}
+@keyframes btnhalo{0%{transform:scale(1);opacity:0.9}100%{transform:scale(1.85);opacity:0}}
+.vapi-call-state-connecting .vapi-btn-ring::before,.vapi-call-state-connecting .vapi-btn-ring::after,.vapi-call-state-active .vapi-btn-ring::before,.vapi-call-state-active .vapi-btn-ring::after{display:none}
+.vapi-call-btn{width:60px;height:60px;border-radius:50%;border:none;cursor:pointer;position:relative;z-index:1;display:flex;align-items:center;justify-content:center;font-family:'Poppins',sans-serif;font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;transition:transform 0.18s cubic-bezier(0.22,1,0.36,1),box-shadow 0.22s,background 0.35s;overflow:hidden;}
+.vapi-call-btn::before{content:'';position:absolute;top:0;left:0;right:0;height:50%;background:linear-gradient(180deg,rgba(255,255,255,0.18),transparent);border-radius:inherit;pointer-events:none}
+.vapi-call-btn.btn-green{background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff;box-shadow:0 0 26px rgba(34,197,94,0.55),0 0 60px rgba(34,197,94,0.2),0 4px 18px rgba(0,0,0,0.45),inset 0 1px 0 rgba(255,255,255,0.2);}
 .vapi-call-btn.btn-green:hover{transform:scale(1.08);box-shadow:0 0 36px rgba(34,197,94,0.7),0 0 80px rgba(34,197,94,0.28),0 6px 22px rgba(0,0,0,0.45),inset 0 1px 0 rgba(255,255,255,0.22)}
-/* ACTIVE: red */
-.vapi-call-btn.btn-red{
-  background:linear-gradient(135deg,#b91c1c,#ef4444);
-  color:#fff;
-  box-shadow:0 0 26px rgba(239,68,68,0.55),0 0 60px rgba(239,68,68,0.2),0 4px 18px rgba(0,0,0,0.45),inset 0 1px 0 rgba(255,255,255,0.18);
-}
+.vapi-call-btn.btn-red{background:linear-gradient(135deg,#b91c1c,#ef4444);color:#fff;box-shadow:0 0 26px rgba(239,68,68,0.55),0 0 60px rgba(239,68,68,0.2),0 4px 18px rgba(0,0,0,0.45),inset 0 1px 0 rgba(255,255,255,0.18);}
 .vapi-call-btn.btn-red:hover{transform:scale(1.08);box-shadow:0 0 36px rgba(239,68,68,0.7),0 0 80px rgba(239,68,68,0.28),0 6px 22px rgba(0,0,0,0.45),inset 0 1px 0 rgba(255,255,255,0.2)}
 .vapi-call-btn:active{transform:scale(0.95) !important}
 .vapi-call-btn:disabled{opacity:0.65;cursor:not-allowed;transform:none !important}
-
-.vapi-btn-label{
-  font-size:10px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;
-  color:rgba(200,215,255,0.4);margin-top:10px;
-}
-
-/* ── SECURED CONNECTION BADGE ── */
-.modal-secure-badge{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:7px 16px;
-  background:rgba(255,255,255,0.03);
-  border:1px solid rgba(255,255,255,0.07);
-  border-radius:100px;
-  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-}
+.vapi-btn-label{font-size:10px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:rgba(200,215,255,0.4);margin-top:10px;}
+.modal-secure-badge{display:inline-flex;align-items:center;gap:8px;padding:7px 16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:100px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
 .modal-secure-icon{width:12px;height:12px;flex-shrink:0;stroke:rgba(120,160,255,0.65);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;fill:none}
 .modal-secure-text{font-family:'Courier New',Courier,monospace;font-size:9px;font-weight:400;letter-spacing:0.15em;text-transform:uppercase;color:rgba(140,170,255,0.5);white-space:nowrap}
 .modal-secure-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;background:rgba(34,197,94,0.7);box-shadow:0 0 6px rgba(34,197,94,0.55);animation:securepulse 2.8s ease-in-out infinite}
 @keyframes securepulse{0%,100%{opacity:0.7}50%{opacity:1}}
-
-/* ── LEGAL NOTE ── */
 .modal-note{font-size:10px;font-weight:300;color:rgba(180,198,238,0.2);letter-spacing:0.01em;text-align:center}
 .modal-note a{color:rgba(100,148,255,0.38);text-decoration:none;transition:color 0.2s}
 .modal-note a:hover{color:rgba(100,148,255,0.75)}
-
-/* mobile */
-@media(max-width:768px){
-  .modal-phone-outer{width:270px;height:490px;border-radius:40px}
-  .modal-phone-inner{border-radius:36px}
-  .modal-phone-inner::before{border-radius:36px 0 0 36px}
-  .modal-notch{width:80px;height:24px}
-  .modal-close{top:16px;right:16px}
-}
+@media(max-width:768px){.modal-phone-outer{width:270px;height:490px;border-radius:40px}.modal-phone-inner{border-radius:36px}.modal-phone-inner::before{border-radius:36px 0 0 36px}.modal-notch{width:80px;height:24px}.modal-close{top:16px;right:16px}}
 
 /* ============================================================
    RESPONSIVE — TABLET (≤ 1024px)
@@ -719,19 +357,8 @@ footer{background:var(--black);border-top:0.5px solid rgba(255,255,255,0.055);pa
   footer{padding:24px 20px}
   .footer-inner{flex-direction:column;align-items:center;gap:16px;text-align:center}
   .footer-links{gap:18px;flex-wrap:wrap;justify-content:center}
-  /* modal phone — already compact, just minor touch adjustments */
-  .modal-phone{width:210px;height:400px;max-height:52vh;border-radius:32px}
-  .modal-phone::before{width:62px;height:18px}
-  .modal-phone::after{border-radius:32px 0 0 32px}
-  .idle-ring:nth-child(5){width:140px;height:140px}
-  .idle-ring:nth-child(6){width:175px;height:175px}
-  .synthflow-wrap{max-width:210px;border-radius:32px}
-  .modal-close{top:16px;right:16px;width:34px;height:34px}
 }
 
-/* ============================================================
-   RESPONSIVE — SMALL PHONES (≤ 380px)
-============================================================ */
 @media (max-width:380px){
   h1{font-size:28px}
   .nav-name{display:none}
@@ -743,12 +370,10 @@ footer{background:var(--black);border-top:0.5px solid rgba(255,255,255,0.055);pa
 <body>
 <div class="bg-ambient"></div>
 
-<!-- ============================================================
-     NAVIGATION
-============================================================ -->
+<!-- NAV -->
 <nav id="nav">
   <a href="#hero" class="nav-brand">
-    <svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.35))">
+    <svg width="32" height="32" viewBox="0 0 100 100" fill="none" style="flex-shrink:0;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.35))">
       <path d="M50,0 C77.6,0 100,22.4 100,50 C100,77.6 77.6,100 50,100 C22.4,100 0,77.6 0,50 C0,22.4 22.4,0 50,0Z" fill="white"/>
       <path d="M50,1.5 C76.8,1.5 98.5,23.2 98.5,50 C98.5,76.8 76.8,98.5 50,98.5 C23.2,98.5 1.5,76.8 1.5,50 C1.5,23.2 23.2,1.5 50,1.5Z" fill="none" stroke="rgba(0,0,0,0.07)" stroke-width="1.5"/>
       <rect x="27" y="38" width="11" height="28" rx="5.5" fill="#0f0f14"/>
@@ -780,22 +405,15 @@ footer{background:var(--black);border-top:0.5px solid rgba(255,255,255,0.055);pa
   <button class="mobile-nav-cta" id="mobileGetStarted">Get Started →</button>
 </div>
 
-<!-- ============================================================
-     HERO
-============================================================ -->
+<!-- HERO -->
 <section id="hero">
   <div class="hero-left">
-    <div class="pill-tag a1">
-      <span class="pill-dot"></span>
-      AI Receptionist for Home Services
-    </div>
+    <div class="pill-tag a1"><span class="pill-dot"></span>AI Receptionist for Home Services</div>
     <h1 class="a2">Ansa AI.<br>Never Miss a<br>$700 Call Again.</h1>
-    <p class="hero-desc a3">
-      The elite AI receptionist for home services.<br>Book more jobs, 24/7. Simple. Smart. Secure.
-    </p>
+    <p class="hero-desc a3">The elite AI receptionist for home services.<br>Book more jobs, 24/7. Simple. Smart. Secure.</p>
     <div class="demo-form a4">
-      <input class="demo-input" id="heroPhone" type="tel" placeholder="+1 (555) 123-4567" autocomplete="tel" />
-      <button class="demo-btn btn-blue" id="heroDemoBtn">Try the AI Demo Now</button>
+      <input class="demo-input" id="heroPhone" type="tel" placeholder="+1 (555) 123-4567" autocomplete="tel"/>
+      <button class="demo-btn btn-blue" id="tryDemoBtn" data-demo-trigger>Try the AI Demo Now</button>
     </div>
   </div>
   <div class="hero-right a-scene">
@@ -825,18 +443,9 @@ footer{background:var(--black);border-top:0.5px solid rgba(255,255,255,0.055);pa
               <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
             </div>
             <div class="call-actions">
-              <div class="call-btn">
-                <svg viewBox="0 0 24 24"><line x1="1" y1="1" x2="23" y2="23"/><path d="M9 9v0a3 3 0 005.12 2.12M3 3v.01A21 21 0 009.37 14M21 21l-1-1"/></svg>
-                <span class="call-btn-label">mute</span>
-              </div>
-              <div class="call-btn">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
-                <span class="call-btn-label">keypad</span>
-              </div>
-              <div class="call-btn">
-                <svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg>
-                <span class="call-btn-label">speaker</span>
-              </div>
+              <div class="call-btn"><svg viewBox="0 0 24 24"><line x1="1" y1="1" x2="23" y2="23"/><path d="M9 9v0a3 3 0 005.12 2.12M3 3v.01A21 21 0 009.37 14M21 21l-1-1"/></svg><span class="call-btn-label">mute</span></div>
+              <div class="call-btn"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg><span class="call-btn-label">keypad</span></div>
+              <div class="call-btn"><svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg><span class="call-btn-label">speaker</span></div>
             </div>
             <div class="call-btn-end">
               <svg viewBox="0 0 24 24"><path d="M10.68 13.31a16 16 0 003.41 2.6l1.27-1.27a2 2 0 012.11-.45c.93.38 1.93.6 2.95.6a1 1 0 011 1v3.5a1 1 0 01-1 1A17 17 0 012 5a1 1 0 011-1h3.5a1 1 0 011 1c0 1.02.22 2 .6 2.95a2 2 0 01-.45 2.11L6.38 11.31" stroke-width="2.2"/><line x1="1" y1="1" x2="23" y2="23" stroke-width="2.2"/></svg>
@@ -863,9 +472,7 @@ footer{background:var(--black);border-top:0.5px solid rgba(255,255,255,0.055);pa
 
 <div class="s-divider"></div>
 
-<!-- ============================================================
-     SOLUTIONS
-============================================================ -->
+<!-- SOLUTIONS -->
 <section id="solutions">
   <div class="section-wrap">
     <div class="section-inner">
@@ -900,9 +507,7 @@ footer{background:var(--black);border-top:0.5px solid rgba(255,255,255,0.055);pa
 
 <div class="s-divider"></div>
 
-<!-- ============================================================
-     PRICING
-============================================================ -->
+<!-- PRICING -->
 <section id="pricing">
   <div class="section-wrap">
     <div class="section-inner">
@@ -916,11 +521,8 @@ footer{background:var(--black);border-top:0.5px solid rgba(255,255,255,0.055);pa
           <div class="price-period">per month, billed monthly</div>
           <div class="price-divider"></div>
           <ul class="price-features">
-            <li>Up to 200 calls/month</li>
-            <li>24/7 AI call answering</li>
-            <li>Basic lead capture</li>
-            <li>Email summary reports</li>
-            <li>1 user dashboard seat</li>
+            <li>Up to 200 calls/month</li><li>24/7 AI call answering</li>
+            <li>Basic lead capture</li><li>Email summary reports</li><li>1 user dashboard seat</li>
           </ul>
           <button class="price-btn price-btn-ghost">Get Started</button>
         </div>
@@ -931,13 +533,9 @@ footer{background:var(--black);border-top:0.5px solid rgba(255,255,255,0.055);pa
           <div class="price-period">per month, billed monthly</div>
           <div class="price-divider"></div>
           <ul class="price-features">
-            <li>Up to 800 calls/month</li>
-            <li>24/7 AI call answering</li>
-            <li>Full lead qualification AI</li>
-            <li>Dynamic calendar booking</li>
-            <li>Live call transcriptions</li>
-            <li>CRM integration</li>
-            <li>3 user dashboard seats</li>
+            <li>Up to 800 calls/month</li><li>24/7 AI call answering</li>
+            <li>Full lead qualification AI</li><li>Dynamic calendar booking</li>
+            <li>Live call transcriptions</li><li>CRM integration</li><li>3 user dashboard seats</li>
           </ul>
           <button class="price-btn btn-blue" style="width:100%;padding:13px;font-size:13px;border-radius:100px;">Get Started</button>
         </div>
@@ -947,13 +545,9 @@ footer{background:var(--black);border-top:0.5px solid rgba(255,255,255,0.055);pa
           <div class="price-period">tailored to your operation</div>
           <div class="price-divider"></div>
           <ul class="price-features">
-            <li>Unlimited call volume</li>
-            <li>Dedicated AI voice model</li>
-            <li>Custom scripts &amp; workflows</li>
-            <li>Multi-location support</li>
-            <li>SLA &amp; uptime guarantee</li>
-            <li>Dedicated success manager</li>
-            <li>Unlimited user seats</li>
+            <li>Unlimited call volume</li><li>Dedicated AI voice model</li>
+            <li>Custom scripts &amp; workflows</li><li>Multi-location support</li>
+            <li>SLA &amp; uptime guarantee</li><li>Dedicated success manager</li><li>Unlimited user seats</li>
           </ul>
           <button class="price-btn price-btn-ghost">Contact Sales</button>
         </div>
@@ -964,33 +558,17 @@ footer{background:var(--black);border-top:0.5px solid rgba(255,255,255,0.055);pa
 
 <div class="s-divider"></div>
 
-<!-- ============================================================
-     COMPANY
-============================================================ -->
+<!-- COMPANY -->
 <section id="company">
   <div class="section-wrap">
     <div class="section-inner">
       <p class="section-eyebrow section-eyebrow-center reveal">— The Ansa Mission</p>
       <h2 class="section-heading section-heading-center reveal"><span>About Us</span></h2>
-      <p class="about-body reveal">
-        Ansa was built on a simple but expensive truth — most home service businesses lose thousands in revenue every month not because of bad work, but because of missed calls. We're here to fix that. Ansa AI is the elite AI receptionist built specifically for HVAC, plumbing, electrical, roofing, and cleaning companies. Every call answered. Every lead qualified. Every job booked. Automatically.
-      </p>
+      <p class="about-body reveal">Ansa was built on a simple but expensive truth — most home service businesses lose thousands in revenue every month not because of bad work, but because of missed calls. We're here to fix that. Ansa AI is the elite AI receptionist built specifically for HVAC, plumbing, electrical, roofing, and cleaning companies. Every call answered. Every lead qualified. Every job booked. Automatically.</p>
       <div class="stats-grid">
-        <div class="stat-card reveal reveal-delay-1">
-          <div class="stat-number">24/7</div>
-          <div class="stat-label">Availability</div>
-          <div class="stat-sublabel">365 days a year, no breaks</div>
-        </div>
-        <div class="stat-card reveal reveal-delay-2">
-          <div class="stat-number">0</div>
-          <div class="stat-label">Missed Leads</div>
-          <div class="stat-sublabel">Every caller captured &amp; qualified</div>
-        </div>
-        <div class="stat-card reveal reveal-delay-3">
-          <div class="stat-number">100%</div>
-          <div class="stat-label">Automated</div>
-          <div class="stat-sublabel">No staff. No training. No overhead.</div>
-        </div>
+        <div class="stat-card reveal reveal-delay-1"><div class="stat-number">24/7</div><div class="stat-label">Availability</div><div class="stat-sublabel">365 days a year, no breaks</div></div>
+        <div class="stat-card reveal reveal-delay-2"><div class="stat-number">0</div><div class="stat-label">Missed Leads</div><div class="stat-sublabel">Every caller captured &amp; qualified</div></div>
+        <div class="stat-card reveal reveal-delay-3"><div class="stat-number">100%</div><div class="stat-label">Automated</div><div class="stat-sublabel">No staff. No training. No overhead.</div></div>
       </div>
     </div>
   </div>
@@ -998,9 +576,7 @@ footer{background:var(--black);border-top:0.5px solid rgba(255,255,255,0.055);pa
 
 <div class="s-divider"></div>
 
-<!-- ============================================================
-     CTA
-============================================================ -->
+<!-- CTA -->
 <section id="cta">
   <div class="section-wrap" style="text-align:center">
     <div class="section-inner">
@@ -1017,13 +593,11 @@ footer{background:var(--black);border-top:0.5px solid rgba(255,255,255,0.055);pa
   </div>
 </section>
 
-<!-- ============================================================
-     FOOTER
-============================================================ -->
+<!-- FOOTER -->
 <footer>
   <div class="footer-inner">
     <a href="#hero" class="footer-brand">
-      <svg width="24" height="24" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;opacity:0.7">
+      <svg width="24" height="24" viewBox="0 0 100 100" fill="none" style="flex-shrink:0;opacity:0.7">
         <path d="M50,0 C77.6,0 100,22.4 100,50 C100,77.6 77.6,100 50,100 C22.4,100 0,77.6 0,50 C0,22.4 22.4,0 50,0Z" fill="white"/>
         <rect x="27" y="38" width="11" height="28" rx="5.5" fill="#0f0f14"/>
         <rect x="44.5" y="28" width="11" height="48" rx="5.5" fill="#0f0f14"/>
@@ -1033,335 +607,310 @@ footer{background:var(--black);border-top:0.5px solid rgba(255,255,255,0.055);pa
     </a>
     <span class="footer-copy">© 2026 Ansa AI. All rights reserved.</span>
     <ul class="footer-links">
-      <li><a href="#">Twitter</a></li>
-      <li><a href="#">LinkedIn</a></li>
-      <li><a href="#">Privacy</a></li>
-      <li><a href="#">Terms</a></li>
+      <li><a href="#">Twitter</a></li><li><a href="#">LinkedIn</a></li>
+      <li><a href="#">Privacy</a></li><li><a href="#">Terms</a></li>
     </ul>
   </div>
 </footer>
 
-<!-- ============================================================
-     DEMO MODAL — VAPI 3D PHONE
-============================================================ -->
+<!-- DEMO MODAL -->
 <div id="demoModal" class="hidden" role="dialog" aria-modal="true" aria-label="Talk to Ansa AI">
-
   <button class="modal-close" id="modalCloseBtn" aria-label="Close">
     <svg viewBox="0 0 12 12"><line x1="1" y1="1" x2="11" y2="11"/><line x1="11" y1="1" x2="1" y2="11"/></svg>
   </button>
-
-  <div class="modal-assembly" id="vapiAssembly">
-
-    <!-- 3D titanium enclosure -->
+  <div class="modal-assembly">
     <div class="modal-phone-outer">
-      <div class="modal-phone-inner" id="vapiPhoneInner">
-
+      <div class="modal-phone-inner">
         <div class="modal-notch"></div>
-
-        <!-- All 4 call states live inside .modal-screen-content -->
         <div class="modal-screen-content vapi-call-state-idle" id="vapiScreen">
-
-          <!-- VISUAL: idle dot (states: idle) | eq bars (states: connecting, active) -->
-          <div class="vapi-idle-visual" id="vapiIdleVisual">
-            <div class="vapi-idle-dot"></div>
-          </div>
+          <div class="vapi-idle-visual" id="vapiIdleVisual"><div class="vapi-idle-dot"></div></div>
           <div class="vapi-active-visual" id="vapiActiveVisual" style="display:none">
-            <div class="vapi-eq-bar"></div>
-            <div class="vapi-eq-bar"></div>
-            <div class="vapi-eq-bar"></div>
-            <div class="vapi-eq-bar"></div>
-            <div class="vapi-eq-bar"></div>
-            <div class="vapi-eq-bar"></div>
+            <div class="vapi-eq-bar"></div><div class="vapi-eq-bar"></div><div class="vapi-eq-bar"></div>
+            <div class="vapi-eq-bar"></div><div class="vapi-eq-bar"></div><div class="vapi-eq-bar"></div>
             <div class="vapi-eq-bar"></div>
           </div>
-
-          <!-- CALLER INFO -->
           <div class="vapi-caller-label">AI Receptionist</div>
           <div class="vapi-caller-name">Ansa AI</div>
           <div class="vapi-status-row">
-            <span class="vapi-status-dot" id="vapiStatusDot"></span>
-            <span id="vapiStatusText">Ready to connect</span>
+            <span class="vapi-status-dot"></span>
+            <span id="callSubtitle">Ready to connect</span>
           </div>
-
-          <!-- TIMER (hidden until active) -->
           <div class="vapi-timer hidden-elm" id="vapiTimer">00:00</div>
-
-          <!-- CALL BUTTON -->
-          <div class="vapi-btn-ring" id="vapiBtnRing">
-            <button class="vapi-call-btn btn-green" id="vapiCallBtn" aria-label="Call Ansa AI">
-              Call
-            </button>
+          <div class="vapi-btn-ring">
+            <button class="vapi-call-btn btn-green" id="callBtn" aria-label="Call Ansa AI">Call</button>
           </div>
           <div class="vapi-btn-label" id="vapiBtnLabel">Call Ansa AI</div>
-
-        </div><!-- /vapiScreen -->
-
+        </div>
       </div>
     </div>
-
-    <!-- SECURED badge -->
     <div class="modal-secure-badge">
-      <svg class="modal-secure-icon" viewBox="0 0 14 14">
-        <rect x="2" y="6" width="10" height="7" rx="1.5"/>
-        <path d="M4.5 6V4.5a2.5 2.5 0 015 0V6"/>
-      </svg>
+      <svg class="modal-secure-icon" viewBox="0 0 14 14"><rect x="2" y="6" width="10" height="7" rx="1.5"/><path d="M4.5 6V4.5a2.5 2.5 0 015 0V6"/></svg>
       <span class="modal-secure-dot"></span>
       <span class="modal-secure-text">Secured 256-bit AI Connection</span>
     </div>
-
-    <p class="modal-note">
-      <a href="#">Privacy Policy</a>&nbsp;·&nbsp;<a href="#">Terms of Service</a>
-    </p>
-
+    <p class="modal-note"><a href="#">Privacy Policy</a>&nbsp;·&nbsp;<a href="#">Terms of Service</a></p>
   </div>
 </div>
 
-<!-- ============================================================
-     JAVASCRIPT
-============================================================ -->
+<!-- Vapi SDK — loaded at bottom of body so DOM is ready -->
+<script src="https://cdn.jsdelivr.net/npm/@vapi-ai/web/dist/vapi.min.js"></script>
+
 <script>
-/* ── Vapi init via CDN global — window.Vapi set by the head script tag ── */
-const vapi = new window.Vapi('e170efb2-900c-4123-966a-7cb8da72d53e');
-console.log('Vapi Initialized Successfully');
-/* ============================================================
-   MOBILE NAV
-============================================================ */
-const hamburger = document.getElementById('navHamburger');
-const mobileNav = document.getElementById('mobileNav');
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("DOM Loaded - locating elements...");
 
-function closeMobileNav(){
-  hamburger.classList.remove('open');
-  hamburger.setAttribute('aria-expanded','false');
-  mobileNav.classList.remove('open');
-  mobileNav.setAttribute('aria-hidden','true');
-}
-hamburger.addEventListener('click', e => {
-  e.stopPropagation();
-  const isOpen = mobileNav.classList.toggle('open');
-  hamburger.classList.toggle('open', isOpen);
-  hamburger.setAttribute('aria-expanded', isOpen);
-  mobileNav.setAttribute('aria-hidden', !isOpen);
-});
-document.addEventListener('click', e => {
-  if (!hamburger.contains(e.target) && !mobileNav.contains(e.target)) closeMobileNav();
-});
-mobileNav.querySelectorAll('a').forEach(link => {
-  link.addEventListener('click', e => {
-    const href = link.getAttribute('href');
-    if (href && href.startsWith('#')) {
-      e.preventDefault();
-      closeMobileNav();
-      setTimeout(() => {
-        const target = document.querySelector(href);
-        if (target) target.scrollIntoView({ behavior: 'smooth' });
-      }, 200);
+    const tryDemoBtn = document.getElementById('tryDemoBtn');
+    const callBtn    = document.getElementById('callBtn');
+    const subtitle   = document.getElementById('callSubtitle');
+    const demoModal  = document.getElementById('demoModal');
+    const closeBtn   = document.getElementById('modalCloseBtn');
+    const ctaBtn     = document.getElementById('ctaDemoBtn');
+    const navBtn     = document.getElementById('navGetStarted');
+
+    if (!tryDemoBtn) console.error("CRITICAL: tryDemoBtn is still missing from the HTML!");
+    if (!callBtn)    console.error("CRITICAL: callBtn is still missing from the HTML!");
+
+    /* ── Vapi init ── */
+    let vapi;
+    try {
+        vapi = new window.Vapi("09e97377-87a5-4fc9-b127-788cc5b7ef41");
+        console.log("Vapi Instantiated Successfully");
+    } catch (err) {
+        console.error("Vapi initialization failed. Check CDN script.", err);
     }
-  });
-});
-document.getElementById('mobileGetStarted').addEventListener('click', () => {
-  closeMobileNav();
-  setTimeout(() => document.getElementById('cta').scrollIntoView({ behavior: 'smooth' }), 200);
-});
 
-/* ============================================================
-   NAV SCROLL + ACTIVE LINKS
-============================================================ */
-const navEl = document.getElementById('nav');
-window.addEventListener('scroll', () => navEl.classList.toggle('scrolled', window.scrollY > 40), { passive: true });
-
-const navSections = ['solutions','pricing','company','cta'];
-const navLinks = document.querySelectorAll('.nav-links a');
-function updateActiveLink(){
-  let current = '';
-  navSections.forEach(id => {
-    const el = document.getElementById(id);
-    if (el && window.scrollY >= el.offsetTop - 130) current = id;
-  });
-  navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + current));
-}
-window.addEventListener('scroll', updateActiveLink, { passive: true });
-navLinks.forEach(link => {
-  link.addEventListener('click', e => {
-    const href = link.getAttribute('href');
-    if (href && href.startsWith('#')) {
-      e.preventDefault();
-      const target = document.querySelector(href);
-      if (target) target.scrollIntoView({ behavior: 'smooth' });
+    /* ── Modal open helper ── */
+    function openModal(triggerBtn) {
+        if (triggerBtn && !triggerBtn.disabled) {
+            triggerBtn.dataset.origHtml = triggerBtn.innerHTML;
+            triggerBtn.innerHTML = '<span class="btn-spinner"></span>Connecting...';
+            triggerBtn.classList.add('connecting');
+            triggerBtn.disabled = true;
+        }
+        setTimeout(function () {
+            if (demoModal) {
+                demoModal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+                requestAnimationFrame(function () {
+                    requestAnimationFrame(function () {
+                        demoModal.classList.add('modal-visible');
+                    });
+                });
+            }
+        }, 1500);
     }
-  });
-});
-document.querySelectorAll('a[href="#hero"], a.footer-brand').forEach(a => {
-  a.addEventListener('click', e => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
-});
 
-/* ============================================================
-   SCROLL REVEAL
-============================================================ */
-const ioReveal = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) { entry.target.classList.add('visible'); ioReveal.unobserve(entry.target); }
-  });
-}, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
-document.querySelectorAll('.reveal').forEach(el => ioReveal.observe(el));
+    /* ── Modal close helper ── */
+    function closeModal() {
+        if (demoModal) {
+            demoModal.classList.remove('modal-visible');
+            document.body.style.overflow = '';
+            demoModal.addEventListener('transitionend', function h() {
+                demoModal.classList.add('hidden');
+                demoModal.removeEventListener('transitionend', h);
+            });
+        }
+        /* reset trigger buttons */
+        setTimeout(function () {
+            document.querySelectorAll('[data-orig-html]').forEach(function (btn) {
+                btn.innerHTML = btn.dataset.origHtml;
+                delete btn.dataset.origHtml;
+                btn.classList.remove('connecting');
+                btn.disabled = false;
+            });
+        }, 380);
+        /* reset call button */
+        if (callBtn) {
+            callBtn.innerText = "Call";
+            callBtn.style.background = "";
+            callBtn.className = "vapi-call-btn btn-green";
+            callBtn.disabled = false;
+            callBtn.classList.remove('active');
+        }
+        if (subtitle) { subtitle.innerText = "Ready to connect"; subtitle.style.color = ""; }
+        /* reset screen visuals */
+        var screen = document.getElementById('vapiScreen');
+        if (screen) screen.className = 'modal-screen-content vapi-call-state-idle';
+        var idle = document.getElementById('vapiIdleVisual');
+        if (idle) idle.style.display = 'flex';
+        var active = document.getElementById('vapiActiveVisual');
+        if (active) active.style.display = 'none';
+        var timer = document.getElementById('vapiTimer');
+        if (timer) { timer.classList.add('hidden-elm'); timer.textContent = '00:00'; }
+        var lbl = document.getElementById('vapiBtnLabel');
+        if (lbl) lbl.innerText = 'Call Ansa AI';
+        /* stop any active call */
+        if (vapi && callBtn && callBtn.classList.contains('active')) { try { vapi.stop(); } catch(e){} }
+    }
 
-/* ============================================================
-   DEMO MODAL — VAPI ESM
-   vapi is constructed at module scope (above), so it is
-   guaranteed to exist before any button click occurs.
-   States: idle → connecting → active → idle
-============================================================ */
-const VAPI_ASSISTANT_ID = '28f96651-d1ae-4482-b279-32b5dfac5680';
+    /* ── Wire "Try Demo" button ── */
+    if (tryDemoBtn) {
+        tryDemoBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log("Demo button clicked! Popping the 3D animation...");
+            openModal(tryDemoBtn);
+        });
+    }
 
-/* DOM refs */
-const demoModal        = document.getElementById('demoModal');
-const modalCloseBtn    = document.getElementById('modalCloseBtn');
-const vapiScreen       = document.getElementById('vapiScreen');
-const vapiIdleVisual   = document.getElementById('vapiIdleVisual');
-const vapiActiveVisual = document.getElementById('vapiActiveVisual');
-const vapiStatusText   = document.getElementById('vapiStatusText');
-const vapiTimer        = document.getElementById('vapiTimer');
-const vapiCallBtn      = document.getElementById('vapiCallBtn');
-const vapiBtnLabel     = document.getElementById('vapiBtnLabel');
-
-/* explicit state var */
-let callState = 'idle';
-
-/* ── TIMER ── */
-let timerInterval = null, timerSecs = 0;
-const fmtTime = s => `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
-function startTimer(){ timerSecs = 0; vapiTimer.textContent = '00:00'; timerInterval = setInterval(() => { timerSecs++; vapiTimer.textContent = fmtTime(timerSecs); }, 1000); }
-function stopTimer(){ clearInterval(timerInterval); timerInterval = null; timerSecs = 0; vapiTimer.textContent = '00:00'; }
-
-/* ── UI STATE MACHINE ── */
-function setCallState(state){
-  callState = state;
-  vapiScreen.className = `modal-screen-content vapi-call-state-${state}`;
-  if(state === 'idle'){
-    vapiIdleVisual.style.display   = 'flex';
-    vapiActiveVisual.style.display = 'none';
-    vapiStatusText.textContent     = 'Ready to connect';
-    vapiTimer.classList.add('hidden-elm');
-    vapiCallBtn.className    = 'vapi-call-btn btn-green';
-    vapiCallBtn.textContent  = 'Call';
-    vapiCallBtn.disabled     = false;
-    vapiBtnLabel.textContent = 'Call Ansa AI';
-    stopTimer();
-  }
-  if(state === 'connecting'){
-    vapiIdleVisual.style.display   = 'none';
-    vapiActiveVisual.style.display = 'flex';
-    vapiStatusText.textContent     = 'Connecting...';
-    vapiTimer.classList.add('hidden-elm');
-    vapiCallBtn.className    = 'vapi-call-btn btn-green';
-    vapiCallBtn.textContent  = '...';
-    vapiCallBtn.disabled     = true;
-    vapiBtnLabel.textContent = 'Connecting';
-  }
-  if(state === 'active'){
-    vapiIdleVisual.style.display   = 'none';
-    vapiActiveVisual.style.display = 'flex';
-    vapiStatusText.textContent     = 'Live';
-    vapiTimer.classList.remove('hidden-elm');
-    vapiCallBtn.className    = 'vapi-call-btn btn-red';
-    vapiCallBtn.textContent  = 'End';
-    vapiCallBtn.disabled     = false;
-    vapiBtnLabel.textContent = 'End Call';
-    startTimer();
-  }
-}
-
-/* ── VAPI EVENTS ── */
-vapi.on('call-start', () => setCallState('active'));
-vapi.on('call-end',   () => setCallState('idle'));
-vapi.on('error', e => {
-  console.error('Vapi Connection Error:', e);
-  /* surface the real error directly on the phone screen */
-  vapiStatusText.innerText = 'Error: ' + (e.message || e.errorMsg || JSON.stringify(e));
-  vapiStatusText.style.color = '#ff4444';
-  /* reset button to green idle so user can retry */
-  setCallState('idle');
-  /* keep the error text visible a beat after state resets */
-  setTimeout(() => {
-    vapiStatusText.innerText = 'Ready to connect';
-    vapiStatusText.style.color = '';
-  }, 6000);
-});
-
-/* ── CALL BUTTON — direct user gesture guarantees mic permission ── */
-vapiCallBtn.addEventListener('click', () => {
-  if(callState === 'idle'){
-    setCallState('connecting');
-    vapi.start(VAPI_ASSISTANT_ID)
-      .then(() => console.log('Vapi call started successfully'))
-      .catch(e => {
-        console.error('Vapi Connection Error:', e);
-        setCallState('idle');
-      });
-  } else if(callState === 'active'){
-    vapi.stop();
-    setTimeout(() => { if(callState !== 'idle') setCallState('idle'); }, 3000);
-  }
-});
-
-/* ── OPEN MODAL ── */
-function openDemo(triggerBtn){
-  if(triggerBtn && !triggerBtn.disabled){
-    triggerBtn.dataset.origHtml = triggerBtn.innerHTML;
-    triggerBtn.innerHTML = '<span class="btn-spinner"></span>Connecting...';
-    triggerBtn.classList.add('connecting');
-    triggerBtn.disabled = true;
-  }
-  setTimeout(() => {
-    setCallState('idle');
-    demoModal.classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
-    requestAnimationFrame(() => requestAnimationFrame(() => demoModal.classList.add('modal-visible')));
-  }, 1500);
-}
-
-/* ── CLOSE MODAL ── */
-function closeDemo(){
-  if(callState === 'active'){ try{ vapi.stop(); }catch(e){} }
-  stopTimer();
-  setCallState('idle');
-  demoModal.classList.remove('modal-visible');
-  document.body.style.overflow = '';
-  demoModal.addEventListener('transitionend', function h(){
-    demoModal.classList.add('hidden');
-    demoModal.removeEventListener('transitionend', h);
-  });
-  setTimeout(() => {
-    document.querySelectorAll('[data-orig-html]').forEach(btn => {
-      btn.innerHTML = btn.dataset.origHtml;
-      delete btn.dataset.origHtml;
-      btn.classList.remove('connecting');
-      btn.disabled = false;
+    /* ── Wire CTA + Nav buttons ── */
+    if (ctaBtn) ctaBtn.addEventListener('click', (e) => { e.preventDefault(); openModal(ctaBtn); });
+    if (navBtn) navBtn.addEventListener('click', () => openModal(navBtn));
+    document.querySelectorAll('.price-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => { e.preventDefault(); openModal(btn); });
     });
-    const navCta = document.getElementById('navGetStarted');
-    if(navCta){ navCta.disabled = false; navCta.classList.remove('connecting'); }
-  }, 380);
-}
 
-/* ── CLOSE TRIGGERS ── */
-modalCloseBtn.addEventListener('click', closeDemo);
-demoModal.addEventListener('click', e => { if(e.target === demoModal) closeDemo(); });
-document.addEventListener('keydown', e => { if(e.key === 'Escape' && !demoModal.classList.contains('hidden')) closeDemo(); });
+    /* ── Wire close button + backdrop ── */
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (demoModal) demoModal.addEventListener('click', (e) => { if (e.target === demoModal) closeModal(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && demoModal && !demoModal.classList.contains('hidden')) closeModal(); });
 
-/* ── DEMO TRIGGER BUTTONS ──
-   <script type="module"> defers until DOM is fully parsed,
-   so getElementById is always safe — no DOMContentLoaded needed. */
-document.getElementById('heroDemoBtn').addEventListener('click', e => {
-  e.preventDefault(); const btn = e.currentTarget; if(!btn.disabled) openDemo(btn);
-});
-document.getElementById('ctaDemoBtn').addEventListener('click', e => {
-  e.preventDefault(); const btn = e.currentTarget; if(!btn.disabled) openDemo(btn);
-});
-document.getElementById('navGetStarted').addEventListener('click', e => {
-  const btn = e.currentTarget; if(!btn.disabled) openDemo(btn);
-});
-document.querySelectorAll('.price-btn').forEach(btn => {
-  btn.addEventListener('click', e => { e.preventDefault(); if(!btn.disabled) openDemo(btn); });
+    /* ── Call button ── */
+    if (callBtn) {
+        callBtn.addEventListener('click', () => {
+            console.log("Call Ansa button clicked!");
+            if (!vapi) { alert("Vapi engine failed to load."); return; }
+            if (callBtn.classList.contains('active')) {
+                console.log("Stopping call...");
+                vapi.stop();
+            } else {
+                console.log("Starting call to Assistant...");
+                callBtn.innerText = "Connecting...";
+                callBtn.disabled = true;
+                var screen = document.getElementById('vapiScreen');
+                if (screen) screen.className = 'modal-screen-content vapi-call-state-connecting';
+                var idle = document.getElementById('vapiIdleVisual');
+                if (idle) idle.style.display = 'none';
+                var activeVis = document.getElementById('vapiActiveVisual');
+                if (activeVis) activeVis.style.display = 'flex';
+                vapi.start('20b00f4b-9715-4a68-8651-43cf1f88870a')
+                    .catch(function(e) {
+                        console.error("Vapi start error:", e);
+                        if (subtitle) { subtitle.innerText = "Error: " + (e.message || "Connection failed"); subtitle.style.color = "#ff4444"; }
+                        callBtn.innerText = "Call";
+                        callBtn.style.background = "";
+                        callBtn.className = "vapi-call-btn btn-green";
+                        callBtn.disabled = false;
+                        if (screen) screen.className = 'modal-screen-content vapi-call-state-idle';
+                        if (idle) idle.style.display = 'flex';
+                        if (activeVis) activeVis.style.display = 'none';
+                    });
+            }
+        });
+    }
+
+    /* ── Vapi events ── */
+    if (vapi) {
+        vapi.on('call-start', () => {
+            console.log("Vapi: Call successfully connected");
+            callBtn.innerText = "End Call";
+            callBtn.style.background = "#ff4444";
+            callBtn.className = "vapi-call-btn btn-red";
+            callBtn.disabled = false;
+            callBtn.classList.add('active');
+            if (subtitle) { subtitle.innerText = "Connected"; subtitle.style.color = ""; }
+            var screen = document.getElementById('vapiScreen');
+            if (screen) screen.className = 'modal-screen-content vapi-call-state-active';
+            var lbl = document.getElementById('vapiBtnLabel');
+            if (lbl) lbl.innerText = 'End Call';
+            var timer = document.getElementById('vapiTimer');
+            if (timer) timer.classList.remove('hidden-elm');
+        });
+
+        vapi.on('call-end', () => {
+            console.log("Vapi: Call ended by user/system");
+            callBtn.innerText = "Call";
+            callBtn.style.background = "";
+            callBtn.className = "vapi-call-btn btn-green";
+            callBtn.disabled = false;
+            callBtn.classList.remove('active');
+            if (subtitle) { subtitle.innerText = "Ready to connect"; subtitle.style.color = ""; }
+            var screen = document.getElementById('vapiScreen');
+            if (screen) screen.className = 'modal-screen-content vapi-call-state-idle';
+            var idle = document.getElementById('vapiIdleVisual');
+            if (idle) idle.style.display = 'flex';
+            var activeVis = document.getElementById('vapiActiveVisual');
+            if (activeVis) activeVis.style.display = 'none';
+            var lbl = document.getElementById('vapiBtnLabel');
+            if (lbl) lbl.innerText = 'Call Ansa AI';
+            var timer = document.getElementById('vapiTimer');
+            if (timer) { timer.classList.add('hidden-elm'); timer.textContent = '00:00'; }
+        });
+
+        vapi.on('error', (e) => {
+            console.error("Vapi Backend Error:", e);
+            if (subtitle) {
+                subtitle.innerText = "Error: " + (e.message || "Connection failed");
+                subtitle.style.color = "#ff4444";
+            }
+            callBtn.innerText = "Call";
+            callBtn.style.background = "";
+            callBtn.className = "vapi-call-btn btn-green";
+            callBtn.disabled = false;
+            callBtn.classList.remove('active');
+        });
+    }
+
+    /* ── Nav scroll + active links ── */
+    var navEl = document.getElementById('nav');
+    if (navEl) window.addEventListener('scroll', () => navEl.classList.toggle('scrolled', window.scrollY > 40), { passive: true });
+    var navSections = ['solutions','pricing','company','cta'];
+    var navLinks = document.querySelectorAll('.nav-links a');
+    function updateActiveLink() {
+        var current = '';
+        navSections.forEach(id => { var el = document.getElementById(id); if (el && window.scrollY >= el.offsetTop - 130) current = id; });
+        navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + current));
+    }
+    window.addEventListener('scroll', updateActiveLink, { passive: true });
+    navLinks.forEach(link => {
+        link.addEventListener('click', e => {
+            var href = link.getAttribute('href');
+            if (href && href.startsWith('#')) { e.preventDefault(); var t = document.querySelector(href); if (t) t.scrollIntoView({ behavior: 'smooth' }); }
+        });
+    });
+    document.querySelectorAll('a[href="#hero"], a.footer-brand').forEach(a => {
+        a.addEventListener('click', e => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+    });
+
+    /* ── Mobile nav ── */
+    var hamburger = document.getElementById('navHamburger');
+    var mobileNavEl = document.getElementById('mobileNav');
+    function closeMobileNav() {
+        hamburger.classList.remove('open'); hamburger.setAttribute('aria-expanded','false');
+        mobileNavEl.classList.remove('open'); mobileNavEl.setAttribute('aria-hidden','true');
+    }
+    hamburger.addEventListener('click', e => {
+        e.stopPropagation();
+        var isOpen = mobileNavEl.classList.toggle('open');
+        hamburger.classList.toggle('open', isOpen);
+        hamburger.setAttribute('aria-expanded', isOpen);
+        mobileNavEl.setAttribute('aria-hidden', !isOpen);
+    });
+    document.addEventListener('click', e => { if (!hamburger.contains(e.target) && !mobileNavEl.contains(e.target)) closeMobileNav(); });
+    mobileNavEl.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', e => {
+            var href = link.getAttribute('href');
+            if (href && href.startsWith('#')) { e.preventDefault(); closeMobileNav(); setTimeout(() => { var t = document.querySelector(href); if (t) t.scrollIntoView({ behavior: 'smooth' }); }, 200); }
+        });
+    });
+    document.getElementById('mobileGetStarted').addEventListener('click', () => {
+        closeMobileNav(); setTimeout(() => document.getElementById('cta').scrollIntoView({ behavior: 'smooth' }), 200);
+    });
+
+    /* ── Scroll reveal ── */
+    document.querySelectorAll('.reveal').forEach(el => {
+        var rect = el.getBoundingClientRect();
+        if (rect.top > window.innerHeight + 50) el.classList.add('animate-in');
+    });
+    if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) { entry.target.classList.remove('animate-in'); entry.target.classList.add('visible'); io.unobserve(entry.target); }
+            });
+        }, { threshold: 0.05, rootMargin: '0px 0px -10px 0px' });
+        document.querySelectorAll('.reveal.animate-in').forEach(el => io.observe(el));
+    }
 });
 </script>
+
 </body>
 </html>
