@@ -652,265 +652,141 @@ footer{background:var(--black);border-top:0.5px solid rgba(255,255,255,0.055);pa
   </div>
 </div>
 
-<!-- Vapi SDK — loaded at bottom of body so DOM is ready -->
-<script src="https://cdn.jsdelivr.net/npm/@vapi-ai/web/dist/vapi.min.js"></script>
+
+<!-- Vapi voice widget — official global embed -->
+<script
+  src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"
+  defer
+  async
+></script>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    console.log("DOM Loaded - locating elements...");
+  window.addEventListener("load", () => {
+    window.vapiSDK.run({
+      apiKey: "09e97377-87a5-4fc9-b127-788cc5b7ef41",
+      assistant: "20b00f4b-9715-4a68-8651-43cf1f88870a",
+      config: {
+        position: "bottom-right"
+      }
+    });
+  });
+</script>
 
+<!-- Modal + nav + scroll reveal -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
     const tryDemoBtn = document.getElementById('tryDemoBtn');
-    const callBtn    = document.getElementById('callBtn');
-    const subtitle   = document.getElementById('callSubtitle');
-    const demoModal  = document.getElementById('demoModal');
-    const closeBtn   = document.getElementById('modalCloseBtn');
     const ctaBtn     = document.getElementById('ctaDemoBtn');
     const navBtn     = document.getElementById('navGetStarted');
+    const demoModal  = document.getElementById('demoModal');
+    const closeBtn   = document.getElementById('modalCloseBtn');
+    const callBtn    = document.getElementById('callBtn');
+    const subtitle   = document.getElementById('callSubtitle');
 
-    if (!tryDemoBtn) console.error("CRITICAL: tryDemoBtn is still missing from the HTML!");
-    if (!callBtn)    console.error("CRITICAL: callBtn is still missing from the HTML!");
-
-    /* ── Vapi init ── */
-    let vapi;
-    try {
-        vapi = new window.Vapi("09e97377-87a5-4fc9-b127-788cc5b7ef41");
-        console.log("Vapi Instantiated Successfully");
-    } catch (err) {
-        console.error("Vapi initialization failed. Check CDN script.", err);
-    }
-
-    /* ── Modal open helper ── */
+    /* ── Modal open ── */
     function openModal(triggerBtn) {
-        if (triggerBtn && !triggerBtn.disabled) {
-            triggerBtn.dataset.origHtml = triggerBtn.innerHTML;
-            triggerBtn.innerHTML = '<span class="btn-spinner"></span>Connecting...';
-            triggerBtn.classList.add('connecting');
-            triggerBtn.disabled = true;
-        }
-        setTimeout(function () {
-            if (demoModal) {
-                demoModal.classList.remove('hidden');
-                document.body.style.overflow = 'hidden';
-                requestAnimationFrame(function () {
-                    requestAnimationFrame(function () {
-                        demoModal.classList.add('modal-visible');
-                    });
-                });
-            }
-        }, 1500);
-    }
-
-    /* ── Modal close helper ── */
-    function closeModal() {
+      if (triggerBtn && !triggerBtn.disabled) {
+        triggerBtn.dataset.origHtml = triggerBtn.innerHTML;
+        triggerBtn.innerHTML = '<span class="btn-spinner"></span>Connecting...';
+        triggerBtn.classList.add('connecting');
+        triggerBtn.disabled = true;
+      }
+      setTimeout(() => {
         if (demoModal) {
-            demoModal.classList.remove('modal-visible');
-            document.body.style.overflow = '';
-            demoModal.addEventListener('transitionend', function h() {
-                demoModal.classList.add('hidden');
-                demoModal.removeEventListener('transitionend', h);
-            });
+          demoModal.classList.remove('hidden');
+          document.body.style.overflow = 'hidden';
+          requestAnimationFrame(() => requestAnimationFrame(() => demoModal.classList.add('modal-visible')));
         }
-        /* reset trigger buttons */
-        setTimeout(function () {
-            document.querySelectorAll('[data-orig-html]').forEach(function (btn) {
-                btn.innerHTML = btn.dataset.origHtml;
-                delete btn.dataset.origHtml;
-                btn.classList.remove('connecting');
-                btn.disabled = false;
-            });
-        }, 380);
-        /* reset call button */
-        if (callBtn) {
-            callBtn.innerText = "Call";
-            callBtn.style.background = "";
-            callBtn.className = "vapi-call-btn btn-green";
-            callBtn.disabled = false;
-            callBtn.classList.remove('active');
-        }
-        if (subtitle) { subtitle.innerText = "Ready to connect"; subtitle.style.color = ""; }
-        /* reset screen visuals */
-        var screen = document.getElementById('vapiScreen');
-        if (screen) screen.className = 'modal-screen-content vapi-call-state-idle';
-        var idle = document.getElementById('vapiIdleVisual');
-        if (idle) idle.style.display = 'flex';
-        var active = document.getElementById('vapiActiveVisual');
-        if (active) active.style.display = 'none';
-        var timer = document.getElementById('vapiTimer');
-        if (timer) { timer.classList.add('hidden-elm'); timer.textContent = '00:00'; }
-        var lbl = document.getElementById('vapiBtnLabel');
-        if (lbl) lbl.innerText = 'Call Ansa AI';
-        /* stop any active call */
-        if (vapi && callBtn && callBtn.classList.contains('active')) { try { vapi.stop(); } catch(e){} }
+      }, 1500);
     }
 
-    /* ── Wire "Try Demo" button ── */
-    if (tryDemoBtn) {
-        tryDemoBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            console.log("Demo button clicked! Popping the 3D animation...");
-            openModal(tryDemoBtn);
+    /* ── Modal close ── */
+    function closeModal() {
+      if (demoModal) {
+        demoModal.classList.remove('modal-visible');
+        document.body.style.overflow = '';
+        demoModal.addEventListener('transitionend', function h() {
+          demoModal.classList.add('hidden');
+          demoModal.removeEventListener('transitionend', h);
         });
+      }
+      if (callBtn) {
+        callBtn.innerText = 'Call'; callBtn.style.background = '';
+        callBtn.className = 'vapi-call-btn btn-green';
+        callBtn.disabled = false; callBtn.classList.remove('active');
+      }
+      if (subtitle) { subtitle.innerText = 'Ready to connect'; subtitle.style.color = ''; }
+      const s  = document.getElementById('vapiScreen');       if (s)  s.className = 'modal-screen-content vapi-call-state-idle';
+      const iv = document.getElementById('vapiIdleVisual');   if (iv) iv.style.display = 'flex';
+      const av = document.getElementById('vapiActiveVisual'); if (av) av.style.display = 'none';
+      const t  = document.getElementById('vapiTimer');        if (t)  { t.classList.add('hidden-elm'); t.textContent = '00:00'; }
+      const lb = document.getElementById('vapiBtnLabel');     if (lb) lb.innerText = 'Call Ansa AI';
+      setTimeout(() => {
+        document.querySelectorAll('[data-orig-html]').forEach(b => {
+          b.innerHTML = b.dataset.origHtml; delete b.dataset.origHtml;
+          b.classList.remove('connecting'); b.disabled = false;
+        });
+      }, 380);
     }
 
-    /* ── Wire CTA + Nav buttons ── */
-    if (ctaBtn) ctaBtn.addEventListener('click', (e) => { e.preventDefault(); openModal(ctaBtn); });
-    if (navBtn) navBtn.addEventListener('click', () => openModal(navBtn));
-    document.querySelectorAll('.price-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => { e.preventDefault(); openModal(btn); });
-    });
-
-    /* ── Wire close button + backdrop ── */
+    /* ── Wire triggers ── */
+    if (tryDemoBtn) tryDemoBtn.addEventListener('click', e => { e.preventDefault(); openModal(tryDemoBtn); });
+    if (ctaBtn)     ctaBtn.addEventListener('click',     e => { e.preventDefault(); openModal(ctaBtn); });
+    if (navBtn)     navBtn.addEventListener('click',     ()  => openModal(navBtn));
+    document.querySelectorAll('.price-btn').forEach(b => b.addEventListener('click', e => { e.preventDefault(); openModal(b); }));
     if (closeBtn) closeBtn.addEventListener('click', closeModal);
-    if (demoModal) demoModal.addEventListener('click', (e) => { if (e.target === demoModal) closeModal(); });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && demoModal && !demoModal.classList.contains('hidden')) closeModal(); });
+    if (demoModal) demoModal.addEventListener('click', e => { if (e.target === demoModal) closeModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && demoModal && !demoModal.classList.contains('hidden')) closeModal(); });
 
-    /* ── Call button ── */
-    if (callBtn) {
-        callBtn.addEventListener('click', () => {
-            console.log("Call Ansa button clicked!");
-            if (!vapi) { alert("Vapi engine failed to load."); return; }
-            if (callBtn.classList.contains('active')) {
-                console.log("Stopping call...");
-                vapi.stop();
-            } else {
-                console.log("Starting call to Assistant...");
-                callBtn.innerText = "Connecting...";
-                callBtn.disabled = true;
-                var screen = document.getElementById('vapiScreen');
-                if (screen) screen.className = 'modal-screen-content vapi-call-state-connecting';
-                var idle = document.getElementById('vapiIdleVisual');
-                if (idle) idle.style.display = 'none';
-                var activeVis = document.getElementById('vapiActiveVisual');
-                if (activeVis) activeVis.style.display = 'flex';
-                vapi.start('20b00f4b-9715-4a68-8651-43cf1f88870a')
-                    .catch(function(e) {
-                        console.error("Vapi start error:", e);
-                        if (subtitle) { subtitle.innerText = "Error: " + (e.message || "Connection failed"); subtitle.style.color = "#ff4444"; }
-                        callBtn.innerText = "Call";
-                        callBtn.style.background = "";
-                        callBtn.className = "vapi-call-btn btn-green";
-                        callBtn.disabled = false;
-                        if (screen) screen.className = 'modal-screen-content vapi-call-state-idle';
-                        if (idle) idle.style.display = 'flex';
-                        if (activeVis) activeVis.style.display = 'none';
-                    });
-            }
-        });
-    }
-
-    /* ── Vapi events ── */
-    if (vapi) {
-        vapi.on('call-start', () => {
-            console.log("Vapi: Call successfully connected");
-            callBtn.innerText = "End Call";
-            callBtn.style.background = "#ff4444";
-            callBtn.className = "vapi-call-btn btn-red";
-            callBtn.disabled = false;
-            callBtn.classList.add('active');
-            if (subtitle) { subtitle.innerText = "Connected"; subtitle.style.color = ""; }
-            var screen = document.getElementById('vapiScreen');
-            if (screen) screen.className = 'modal-screen-content vapi-call-state-active';
-            var lbl = document.getElementById('vapiBtnLabel');
-            if (lbl) lbl.innerText = 'End Call';
-            var timer = document.getElementById('vapiTimer');
-            if (timer) timer.classList.remove('hidden-elm');
-        });
-
-        vapi.on('call-end', () => {
-            console.log("Vapi: Call ended by user/system");
-            callBtn.innerText = "Call";
-            callBtn.style.background = "";
-            callBtn.className = "vapi-call-btn btn-green";
-            callBtn.disabled = false;
-            callBtn.classList.remove('active');
-            if (subtitle) { subtitle.innerText = "Ready to connect"; subtitle.style.color = ""; }
-            var screen = document.getElementById('vapiScreen');
-            if (screen) screen.className = 'modal-screen-content vapi-call-state-idle';
-            var idle = document.getElementById('vapiIdleVisual');
-            if (idle) idle.style.display = 'flex';
-            var activeVis = document.getElementById('vapiActiveVisual');
-            if (activeVis) activeVis.style.display = 'none';
-            var lbl = document.getElementById('vapiBtnLabel');
-            if (lbl) lbl.innerText = 'Call Ansa AI';
-            var timer = document.getElementById('vapiTimer');
-            if (timer) { timer.classList.add('hidden-elm'); timer.textContent = '00:00'; }
-        });
-
-        vapi.on('error', (e) => {
-            console.error("Vapi Backend Error:", e);
-            if (subtitle) {
-                subtitle.innerText = "Error: " + (e.message || "Connection failed");
-                subtitle.style.color = "#ff4444";
-            }
-            callBtn.innerText = "Call";
-            callBtn.style.background = "";
-            callBtn.className = "vapi-call-btn btn-green";
-            callBtn.disabled = false;
-            callBtn.classList.remove('active');
-        });
-    }
-
-    /* ── Nav scroll + active links ── */
-    var navEl = document.getElementById('nav');
+    /* ── Nav ── */
+    const navEl = document.getElementById('nav');
     if (navEl) window.addEventListener('scroll', () => navEl.classList.toggle('scrolled', window.scrollY > 40), { passive: true });
-    var navSections = ['solutions','pricing','company','cta'];
-    var navLinks = document.querySelectorAll('.nav-links a');
-    function updateActiveLink() {
-        var current = '';
-        navSections.forEach(id => { var el = document.getElementById(id); if (el && window.scrollY >= el.offsetTop - 130) current = id; });
-        navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + current));
-    }
-    window.addEventListener('scroll', updateActiveLink, { passive: true });
-    navLinks.forEach(link => {
-        link.addEventListener('click', e => {
-            var href = link.getAttribute('href');
-            if (href && href.startsWith('#')) { e.preventDefault(); var t = document.querySelector(href); if (t) t.scrollIntoView({ behavior: 'smooth' }); }
-        });
-    });
-    document.querySelectorAll('a[href="#hero"], a.footer-brand').forEach(a => {
-        a.addEventListener('click', e => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
-    });
+    const navSections = ['solutions','pricing','company','cta'];
+    const navLinks = document.querySelectorAll('.nav-links a');
+    window.addEventListener('scroll', () => {
+      let cur = ''; navSections.forEach(id => { const el = document.getElementById(id); if (el && window.scrollY >= el.offsetTop - 130) cur = id; });
+      navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + cur));
+    }, { passive: true });
+    navLinks.forEach(link => link.addEventListener('click', e => {
+      const href = link.getAttribute('href');
+      if (href && href.startsWith('#')) { e.preventDefault(); const t = document.querySelector(href); if (t) t.scrollIntoView({ behavior: 'smooth' }); }
+    }));
+    document.querySelectorAll('a[href="#hero"], a.footer-brand').forEach(a => a.addEventListener('click', e => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }));
 
     /* ── Mobile nav ── */
-    var hamburger = document.getElementById('navHamburger');
-    var mobileNavEl = document.getElementById('mobileNav');
+    const hamburger   = document.getElementById('navHamburger');
+    const mobileNavEl = document.getElementById('mobileNav');
     function closeMobileNav() {
-        hamburger.classList.remove('open'); hamburger.setAttribute('aria-expanded','false');
-        mobileNavEl.classList.remove('open'); mobileNavEl.setAttribute('aria-hidden','true');
+      hamburger.classList.remove('open'); hamburger.setAttribute('aria-expanded', 'false');
+      mobileNavEl.classList.remove('open'); mobileNavEl.setAttribute('aria-hidden', 'true');
     }
     hamburger.addEventListener('click', e => {
-        e.stopPropagation();
-        var isOpen = mobileNavEl.classList.toggle('open');
-        hamburger.classList.toggle('open', isOpen);
-        hamburger.setAttribute('aria-expanded', isOpen);
-        mobileNavEl.setAttribute('aria-hidden', !isOpen);
+      e.stopPropagation();
+      const isOpen = mobileNavEl.classList.toggle('open');
+      hamburger.classList.toggle('open', isOpen);
+      hamburger.setAttribute('aria-expanded', isOpen);
+      mobileNavEl.setAttribute('aria-hidden', !isOpen);
     });
     document.addEventListener('click', e => { if (!hamburger.contains(e.target) && !mobileNavEl.contains(e.target)) closeMobileNav(); });
-    mobileNavEl.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', e => {
-            var href = link.getAttribute('href');
-            if (href && href.startsWith('#')) { e.preventDefault(); closeMobileNav(); setTimeout(() => { var t = document.querySelector(href); if (t) t.scrollIntoView({ behavior: 'smooth' }); }, 200); }
-        });
-    });
+    mobileNavEl.querySelectorAll('a').forEach(link => link.addEventListener('click', e => {
+      const href = link.getAttribute('href');
+      if (href && href.startsWith('#')) { e.preventDefault(); closeMobileNav(); setTimeout(() => { const t = document.querySelector(href); if (t) t.scrollIntoView({ behavior: 'smooth' }); }, 200); }
+    }));
     document.getElementById('mobileGetStarted').addEventListener('click', () => {
-        closeMobileNav(); setTimeout(() => document.getElementById('cta').scrollIntoView({ behavior: 'smooth' }), 200);
+      closeMobileNav(); setTimeout(() => document.getElementById('cta').scrollIntoView({ behavior: 'smooth' }), 200);
     });
 
     /* ── Scroll reveal ── */
     document.querySelectorAll('.reveal').forEach(el => {
-        var rect = el.getBoundingClientRect();
-        if (rect.top > window.innerHeight + 50) el.classList.add('animate-in');
+      if (el.getBoundingClientRect().top > window.innerHeight + 50) el.classList.add('animate-in');
     });
     if ('IntersectionObserver' in window) {
-        var io = new IntersectionObserver(entries => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) { entry.target.classList.remove('animate-in'); entry.target.classList.add('visible'); io.unobserve(entry.target); }
-            });
-        }, { threshold: 0.05, rootMargin: '0px 0px -10px 0px' });
-        document.querySelectorAll('.reveal.animate-in').forEach(el => io.observe(el));
+      const io = new IntersectionObserver(entries => {
+        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.remove('animate-in'); e.target.classList.add('visible'); io.unobserve(e.target); } });
+      }, { threshold: 0.05, rootMargin: '0px 0px -10px 0px' });
+      document.querySelectorAll('.reveal.animate-in').forEach(el => io.observe(el));
     }
-});
+  });
 </script>
-
 </body>
 </html>
