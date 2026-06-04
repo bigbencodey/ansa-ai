@@ -10,6 +10,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- Vapi Web SDK — loaded before any script so window.Vapi is available -->
+<script src="https://cdn.jsdelivr.net/npm/@vapi-ai/web/dist/vapi.min.js"></script>
 <style>
 /* ============================================================
    RESET & DESIGN TOKENS
@@ -1117,10 +1119,9 @@ footer{background:var(--black);border-top:0.5px solid rgba(255,255,255,0.055);pa
 <!-- ============================================================
      JAVASCRIPT
 ============================================================ -->
-<script type="module">
-/* ── Vapi ESM import — guarantees the constructor exists before any click ── */
-import Vapi from 'https://esm.sh/@vapi-ai/web';
-const vapi = new Vapi('e170efb2-900c-4123-966a-7cb8da72d53e');
+<script>
+/* ── Vapi init via CDN global — window.Vapi set by the head script tag ── */
+const vapi = new window.Vapi('e170efb2-900c-4123-966a-7cb8da72d53e');
 console.log('Vapi Initialized Successfully');
 /* ============================================================
    MOBILE NAV
@@ -1269,12 +1270,21 @@ function setCallState(state){
   }
 }
 
-/* ── VAPI EVENTS — wired at module parse time, before any click ── */
+/* ── VAPI EVENTS ── */
 vapi.on('call-start', () => setCallState('active'));
 vapi.on('call-end',   () => setCallState('idle'));
 vapi.on('error', e => {
   console.error('Vapi Connection Error:', e);
+  /* surface the real error directly on the phone screen */
+  vapiStatusText.innerText = 'Error: ' + (e.message || e.errorMsg || JSON.stringify(e));
+  vapiStatusText.style.color = '#ff4444';
+  /* reset button to green idle so user can retry */
   setCallState('idle');
+  /* keep the error text visible a beat after state resets */
+  setTimeout(() => {
+    vapiStatusText.innerText = 'Ready to connect';
+    vapiStatusText.style.color = '';
+  }, 6000);
 });
 
 /* ── CALL BUTTON — direct user gesture guarantees mic permission ── */
