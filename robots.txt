@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# favicons MUST be crawlable or Google shows the generic globe
+Allow: /favicon.ico
+Allow: /favicon/
+
+Sitemap: https://www.agent-ding.com/sitemap.xml
